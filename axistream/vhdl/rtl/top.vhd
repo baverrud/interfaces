@@ -1,9 +1,9 @@
 -- =====================================================================
 -- top.vhd - synthesizable top: producer -> stream_fifo -> consumer
 -- =====================================================================
--- Wires the packed-pixel pipeline together. The two mode-view signals are
--- constrained to the PIXEL_W payload width; the same stream_fifo/sync_fifo
--- would serve any other width (see the IQ stream exercised in the TB).
+-- Wires the packed-pixel pipeline together.  Signal constraints for
+-- all sideband elements are provided — TLAST enabled, all others absent
+-- (null ranges).  Clock/reset remain as top-level ports.
 -- =====================================================================
 library ieee;
 use ieee.std_logic_1164.all;
@@ -27,9 +27,22 @@ entity top is
 end entity;
 
 architecture rtl of top is
-    -- Stream signals carrying a serialised pixel (PIXEL_W bits wide).
-    signal src  : axis_t(tdata(PIXEL_W - 1 downto 0));
-    signal sink : axis_t(tdata(PIXEL_W - 1 downto 0));
+    signal src  : axis_t(
+        tdata(PIXEL_W - 1 downto 0),
+        tuser(0 downto 0),
+        tid(0 downto 0),
+        tdest(0 downto 0),
+        tkeep(0 downto 0),
+        tstrb(0 downto 0)
+    );
+    signal sink : axis_t(
+        tdata(PIXEL_W - 1 downto 0),
+        tuser(0 downto 0),
+        tid(0 downto 0),
+        tdest(0 downto 0),
+        tkeep(0 downto 0),
+        tstrb(0 downto 0)
+    );
 begin
 
     u_prod : entity work.pixel_producer
@@ -37,7 +50,7 @@ begin
         port map (clk => clk, rst => rst, m => src);
 
     u_fifo : entity work.stream_fifo
-        generic map (DATA_W => PIXEL_W, DEPTH => FIFO_DEPTH)
+        generic map (DEPTH => FIFO_DEPTH)
         port map (clk => clk, rst => rst, s => src, m => sink);
 
     u_cons : entity work.pixel_consumer

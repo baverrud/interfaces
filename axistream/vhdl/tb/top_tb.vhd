@@ -32,8 +32,23 @@ architecture sim of top_tb is
     signal beats    : std_logic_vector(15 downto 0);
 
     -- second stream: IQ samples through a generic stream_fifo (32-bit)
-    signal iq_src  : axis_t(tdata(IQ_W - 1 downto 0));
-    signal iq_sink : axis_t(tdata(IQ_W - 1 downto 0));
+    -- TLAST enabled (1 bit), all other sidebands absent (null ranges)
+    signal iq_src  : axis_t(
+        tdata(IQ_W - 1 downto 0),
+        tuser(0 downto 0),
+        tid(0 downto 0),
+        tdest(0 downto 0),
+        tkeep(0 downto 0),
+        tstrb(0 downto 0)
+    );
+    signal iq_sink : axis_t(
+        tdata(IQ_W - 1 downto 0),
+        tuser(0 downto 0),
+        tid(0 downto 0),
+        tdest(0 downto 0),
+        tkeep(0 downto 0),
+        tstrb(0 downto 0)
+    );
 
     signal sof_seen : boolean := false;
 begin
@@ -50,7 +65,7 @@ begin
 
     -- DUT 2: a second generic FIFO instance, this time at the IQ width
     dut_iq : entity work.stream_fifo
-        generic map (DATA_W => IQ_W, DEPTH => 16)
+        generic map (DEPTH => 16)
         port map (clk => clk, rst => rst, s => iq_src, m => iq_sink);
 
     -- observe at least one start-of-frame leaving the pixel pipeline

@@ -1,9 +1,8 @@
 -- =====================================================================
--- pixel_consumer.vhd - receives a stream, unpacks pixels, exposes them
+-- pixel_consumer.vhd - receives a stream, unpacks pixels
 -- =====================================================================
--- Application-side sink: it splits the (PIXEL_W-wide) tdata back into a
--- pixel_t via pixel_from_slv and registers the most-recent pixel and a
--- beat counter as design outputs (so synthesis keeps the logic).
+-- Clock/reset are separate ports (not in the interface record).
+-- Beat acceptance gated on tvalid AND tready (was tvalid-only).
 -- =====================================================================
 library ieee;
 use ieee.std_logic_1164.all;
@@ -15,7 +14,7 @@ entity pixel_consumer is
     port (
         clk      : in  std_logic;
         rst      : in  std_logic;
-        s        : view rx of axis_t;    -- tdata PIXEL_W wide
+        s        : view slave of axis_t;
         last_r   : out std_logic_vector(7 downto 0);
         last_g   : out std_logic_vector(7 downto 0);
         last_b   : out std_logic_vector(7 downto 0);
@@ -29,8 +28,8 @@ architecture rtl of pixel_consumer is
     signal nbeat : unsigned(15 downto 0) := (others => '0');
 begin
 
-    s.tready <= '1';                       -- always ready
-    px       <= pixel_from_slv(s.tdata);   -- de-serialise combinationally
+    s.tready <= '1';
+    px       <= pixel_from_slv(s.tdata);
 
     process (clk)
     begin
@@ -41,7 +40,7 @@ begin
                 last_g   <= (others => '0');
                 last_b   <= (others => '0');
                 last_sof <= '0';
-            elsif s.tvalid = '1' then      -- accepted beat (tready = '1')
+            elsif s.tvalid = '1' and s.tready = '1' then   -- accepted beat
                 last_r   <= px.r;
                 last_g   <= px.g;
                 last_b   <= px.b;

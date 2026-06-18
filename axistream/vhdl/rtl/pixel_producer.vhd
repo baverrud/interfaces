@@ -1,10 +1,8 @@
 -- =====================================================================
--- pixel_producer.vhd - builds RGB pixels, packs them onto a Tx stream
+-- pixel_producer.vhd - builds RGB pixels, drives axis_t.master
 -- =====================================================================
--- Application-side module: it constructs a structured pixel_t each beat,
--- serialises it onto the (PIXEL_W-wide) tdata via pixel_to_slv, and marks
--- end-of-line with tlast. The stream infrastructure below it never needs
--- to know what the bits mean.
+-- Drives tdata with pixel data, tlast at end-of-line, and ties unused
+-- sidebands to '0'.  Matches the SV pixel_producer behaviour.
 -- =====================================================================
 library ieee;
 use ieee.std_logic_1164.all;
@@ -14,22 +12,21 @@ use work.payload_pkg.all;
 
 entity pixel_producer is
     generic (
-        LINE : positive := 8       -- pixels per line; tlast at end of line
+        LINE : positive := 8
     );
     port (
         clk : in  std_logic;
         rst : in  std_logic;
-        m   : view tx of axis_t    -- tdata must be PIXEL_W wide
+        m   : view master of axis_t
     );
 end entity;
 
 architecture rtl of pixel_producer is
-    signal cnt  : unsigned(7 downto 0) := (others => '0');  -- pixel index in line
-    signal seed : unsigned(7 downto 0) := (others => '0');  -- evolving colour
+    signal cnt  : unsigned(7 downto 0) := (others => '0');
+    signal seed : unsigned(7 downto 0) := (others => '0');
     signal px   : pixel_t;
 begin
 
-    -- Construct a pixel and serialise it onto the stream.
     px.r   <= std_logic_vector(seed);
     px.g   <= std_logic_vector(seed + 1);
     px.b   <= std_logic_vector(seed + 2);
@@ -38,6 +35,12 @@ begin
     m.tdata  <= pixel_to_slv(px);
     m.tvalid <= '1';
     m.tlast  <= '1' when cnt = LINE - 1 else '0';
+    -- 1-bit sideband stubs — tie low (synthesis constant-propagates to zero)
+    m.tuser  <= (m.tuser'range => '0');
+    m.tid    <= (m.tid'range => '0');
+    m.tdest  <= (m.tdest'range => '0');
+    m.tkeep  <= (m.tkeep'range => '0');
+    m.tstrb  <= (m.tstrb'range => '0');
 
     process (clk)
     begin
@@ -45,7 +48,7 @@ begin
             if rst = '1' then
                 cnt  <= (others => '0');
                 seed <= (others => '0');
-            elsif m.tready = '1' then       -- advance only on an accepted beat
+            elsif m.tready = '1' then
                 seed <= seed + 1;
                 if cnt = LINE - 1 then
                     cnt <= (others => '0');

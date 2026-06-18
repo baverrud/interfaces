@@ -1,13 +1,18 @@
 -- =====================================================================
--- stream_pkg.vhd - generic-width AXI-Stream-like interface (VHDL-2019)
+-- stream_pkg.vhd - AXI-Stream record + VHDL-2019 mode views
 -- =====================================================================
--- A single mode-view stream record that works for ANY data width: the
--- 'tdata' element is left unconstrained (VHDL-2008) and is constrained
--- where a signal/port is declared, e.g.
---     signal s : axis_t(tdata(31 downto 0));
+-- All sideband signals are unconstrained std_logic_vector.  Width = 0
+-- (null range, e.g. tlast(-1 downto 0)) means the signal is absent.
+-- aclk/aresetn are NOT in the record — they remain as separate ports
+-- in VHDL (unlike the SV version which puts them in the interface).
 --
--- The 'tx' mode view (VHDL-2019) makes the transmitter drive the payload
--- and sample back-pressure; 'rx' is its converse for the receiver.
+-- Signal declaration:
+--   signal s : axis_t(
+--       tdata(31 downto 0),
+--       tlast(0 downto 0),       -- 1 bit = present
+--       tuser(-1 downto 0),      -- null range = absent
+--       ...
+--   );
 -- =====================================================================
 library ieee;
 use ieee.std_logic_1164.all;
@@ -15,21 +20,31 @@ use ieee.std_logic_1164.all;
 package stream_pkg is
 
     type axis_t is record
-        tdata  : std_logic_vector;   -- unconstrained: width chosen per signal
-        tlast  : std_logic;          -- end-of-packet marker
-        tvalid : std_logic;          -- transmitter has data
-        tready : std_logic;          -- receiver can accept
+        tdata  : std_logic_vector;   -- payload
+        tlast  : std_logic;          -- end-of-packet (always present)
+        tuser  : std_logic_vector;   -- 1-bit stub when unused
+        tid    : std_logic_vector;
+        tdest  : std_logic_vector;
+        tkeep  : std_logic_vector;
+        tstrb  : std_logic_vector;
+        tvalid : std_logic;
+        tready : std_logic;
     end record;
 
-    -- Transmitter (Tx) drives data + framing, reads back-pressure.
-    view tx of axis_t is
+    -- master (Tx): drives payload + framing, samples back-pressure.
+    view master of axis_t is
         tdata  : out;
         tlast  : out;
+        tuser  : out;
+        tid    : out;
+        tdest  : out;
+        tkeep  : out;
+        tstrb  : out;
         tvalid : out;
         tready : in;
     end view;
 
-    -- Receiver (Rx) is the exact converse of Tx.
-    alias rx is tx'converse;
+    -- slave (Rx): converse of master.
+    alias slave is master'converse;
 
 end package;
