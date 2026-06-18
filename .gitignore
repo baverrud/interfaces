@@ -1,0 +1,11 @@
+# =====================================================================
+# .gitignore - FPGA tool generated files
+# =====================================================================
+
+# Ignore all simulation and Vivado output directories
+**/sim/
+**/viv/
+
+# Windows
+Thumbs.db
+desktop.ini
