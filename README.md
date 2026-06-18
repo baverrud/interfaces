@@ -6,7 +6,7 @@ FPGA interface projects using SystemVerilog and VHDL.
 
 ```
 interfaces/
-├── scripts/              ← shared Tcl scripts (modelsim, vivado)
+├── common/scripts/       ← shared Tcl scripts (modelsim, vivado)
 ├── axistream/            ← AXI-Stream interface project
 └── ...                   ← future sub-projects
 ```

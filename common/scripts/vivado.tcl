@@ -68,8 +68,8 @@ proc vivado_file_type {f} {
     switch -- [file extension $f] {
         .sv     { return SystemVerilog }
         .v      { return Verilog }
-        .vhd    { return VHDL }
-        .vhdl   { return VHDL }
+        .vhd    { return {VHDL 2019} }
+        .vhdl   { return {VHDL 2019} }
         default { error "Unknown file extension on $f" }
     }
 }
@@ -104,8 +104,14 @@ if {[lsearch -exact $argv "-run"] >= 0} {
 
 if {$RUN_FLOWS} {
     puts "INFO: ---- Running RTL elaboration / synthesis ----"
-    synth_design -rtl -name rtl_${PROJ_NAME}
-    puts "SYNTH: top ports = [llength [get_ports]]"
+    # VHDL-2019 mode views (view/alias ...'converse) are not supported by
+    # Vivado synthesis; catch the error so simulation still runs.
+    if {[catch { synth_design -rtl -name rtl_${PROJ_NAME} }]} {
+        puts "WARNING: RTL elaboration failed (VHDL-2019 constructs may not be\
+               synthesizable in Vivado) — skipping to simulation."
+    } else {
+        puts "SYNTH: top ports = [llength [get_ports]]"
+    }
 
     puts "INFO: ---- Running behavioral simulation ----"
     launch_simulation
