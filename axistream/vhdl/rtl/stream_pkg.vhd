@@ -1,16 +1,15 @@
 -- =====================================================================
 -- stream_pkg.vhd - AXI-Stream record + VHDL-2019 mode views
 -- =====================================================================
--- All sideband signals are unconstrained std_logic_vector.  Width = 0
--- (null range, e.g. tlast(-1 downto 0)) means the signal is absent.
+-- All sideband signals (except tlast) are unconstrained std_logic_vector.
+-- 1-bit safe-width stubs when unused — NEVER null ranges (crash Vivado GUI).
 -- aclk/aresetn are NOT in the record — they remain as separate ports
 -- in VHDL (unlike the SV version which puts them in the interface).
 --
 -- Signal declaration:
 --   signal s : axis_t(
 --       tdata(31 downto 0),
---       tlast(0 downto 0),       -- 1 bit = present
---       tuser(-1 downto 0),      -- null range = absent
+--       tuser(0 downto 0),       -- 1-bit stub
 --       ...
 --   );
 -- =====================================================================
@@ -21,7 +20,7 @@ package stream_pkg is
 
     type axis_t is record
         tdata  : std_logic_vector;   -- payload
-        tlast  : std_logic;          -- end-of-packet (always present)
+        tlast  : std_logic;          -- end-of-packet (always 1 bit)
         tuser  : std_logic_vector;   -- 1-bit stub when unused
         tid    : std_logic_vector;
         tdest  : std_logic_vector;
