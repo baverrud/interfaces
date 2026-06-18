@@ -10,7 +10,7 @@
 
 setlocal
 
-set "SCRIPT_DIR=%~dp0..\..\..\scripts"
+set "SCRIPT_DIR=%~dp0..\..\..\common\scripts"
 set "PROJ_DIR=%~dp0"
 
 if not exist "%PROJ_DIR%..\viv" mkdir "%PROJ_DIR%..\viv"
