@@ -13,14 +13,7 @@ interfaces/
 
 ## Prerequisites
 
-Run the appropriate environment setup in a **cmd.exe** window before launching any scripts:
-
-| Tool            | Command | Installed at                     |
-|-----------------|---------|----------------------------------|
-| ModelSim 2020.1 | `m20`   | `C:\intelFPGA\20.1\modelsim_ase` |
-| Questa 2025.2   | `q25`   | `C:\altera\25.1std\questa_fse`   |
-| Vivado 2025.2   | `v25`   | `C:\Xilinx\2025.2\Vivado`        |
-| Vivado 2023.2   | `v23`   | `C:\Xilinx\Vivado\2023.2`        |
+Run the appropriate environment setup before launching any scripts.
 
 ## Workflow
 
