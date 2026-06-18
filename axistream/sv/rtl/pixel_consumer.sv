@@ -1,13 +1,13 @@
+`timescale 1ns/1ps
 // =====================================================================
 // pixel_consumer.sv - receives a stream, unpacks pixels, exposes them
 // =====================================================================
 // 'px = s.tdata' IS the "unpack" - assigning the bus to a packed struct
-// splits the fields automatically.
+// splits the fields automatically.  Clock/reset come from the interface
+// (s.aclk / s.aresetn, active-low async).
 // =====================================================================
 module pixel_consumer (
-    input  logic        clk,
-    input  logic        rst,
-    axis_if.rx          s,        // s.tdata is pixel_t (from the instance)
+    axis_if.slave       s,        // s.tdata is pixel_t (from the instance)
     output logic [7:0]  last_r,
     output logic [7:0]  last_g,
     output logic [7:0]  last_b,
@@ -22,14 +22,14 @@ module pixel_consumer (
     assign s.tready = 1'b1;        // always ready
     assign px       = s.tdata;     // bus -> packed struct, automatically
 
-    always_ff @(posedge clk) begin
-        if (rst) begin
+    always_ff @(posedge s.aclk or negedge s.aresetn) begin
+        if (!s.aresetn) begin
             nbeat    <= '0;
             last_r   <= '0;
             last_g   <= '0;
             last_b   <= '0;
             last_sof <= '0;
-        end else if (s.tvalid) begin   // accepted beat (tready == 1)
+        end else if (s.tvalid && s.tready) begin   // accepted beat
             last_r   <= px.r;
             last_g   <= px.g;
             last_b   <= px.b;

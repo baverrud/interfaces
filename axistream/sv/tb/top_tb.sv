@@ -15,8 +15,8 @@ module top_tb;
     localparam time TCLK = 10ns;
     localparam int  NIQ  = 8;
 
-    logic clk = 0;
-    logic rst = 1;
+    logic aclk    = 0;
+    logic aresetn = 0;
 
     // pixel pipeline outputs
     logic [7:0]  last_r, last_g, last_b;
@@ -28,21 +28,28 @@ module top_tb;
 
     // -------- DUT 1: full pixel pipeline -----------------------------
     top #(.FIFO_DEPTH(16), .LINE(8)) dut_pix (
-        .clk, .rst, .last_r, .last_g, .last_b, .last_sof, .beats
+        .aclk, .aresetn, .last_r, .last_g, .last_b, .last_sof, .beats
     );
 
     // -------- DUT 2: a second generic FIFO at the IQ width ------------
-    axis_if #(.T(iq_t)) iq_src ();
-    axis_if #(.T(iq_t)) iq_sink ();
-    stream_fifo #(.T(iq_t), .DEPTH(16)) dut_iq (
-        .clk, .rst, .s(iq_src.rx), .m(iq_sink.tx)
+    axis_if #(.PAYLOAD_T(iq_t), .HAS_TLAST(1)) iq_src  (.aclk, .aresetn);
+    axis_if #(.PAYLOAD_T(iq_t), .HAS_TLAST(1)) iq_sink (.aclk, .aresetn);
+    stream_fifo #(.PAYLOAD_T(iq_t), .DEPTH(16), .HAS_TLAST(1)) dut_iq (
+        .s(iq_src.slave), .m(iq_sink.master)
     );
 
+    // tie off unused sidebands on the IQ source
+    assign iq_src.tuser = '0;
+    assign iq_src.tid   = '0;
+    assign iq_src.tdest = '0;
+    assign iq_src.tkeep = '0;
+    assign iq_src.tstrb = '0;
+
     // clock
-    always #(TCLK/2) clk = ~clk;
+    always #(TCLK/2) aclk = ~aclk;
 
     // observe a start-of-frame leaving the pixel pipeline
-    always @(posedge clk) if (last_sof) sof_seen <= 1;
+    always @(posedge aclk) if (last_sof) sof_seen <= 1;
 
     initial begin
         iq_t    seq [NIQ];
@@ -55,10 +62,10 @@ module top_tb;
         iq_src.tlast   = 0;
         iq_src.tdata   = '0;
         iq_sink.tready = 0;
-        rst = 1;
-        repeat (4) @(posedge clk);
-        @(posedge clk);
-        rst = 0;
+        aresetn = 0;
+        repeat (4) @(posedge aclk);
+        @(posedge aclk);
+        aresetn = 1;
 
         // ---- 1) pack/unpack (bit-cast) round-trips -----------------
         assert ($bits(pixel_t) == 25) else $fatal(1, "PIXEL width != 25");
@@ -89,26 +96,26 @@ module top_tb;
             iq_src.tdata  = seq[k];
             iq_src.tlast  = (k == NIQ-1);
             iq_src.tvalid = 1;
-            do @(posedge clk); while (!iq_src.tready);
+            do @(posedge aclk); while (!iq_src.tready);
         end
         iq_src.tvalid = 0;
 
         // read phase: inspect head (tready=0), then pulse tready to pop
         for (int k = 0; k < NIQ; k++) begin
-            do @(posedge clk); while (!iq_sink.tvalid);
+            do @(posedge aclk); while (!iq_sink.tvalid);
             got = iq_sink.tdata;
             assert (got == seq[k])
                 else $fatal(1, "IQ FIFO data/order mismatch k=%0d", k);
             if (k == NIQ-1)
                 assert (iq_sink.tlast) else $fatal(1, "IQ FIFO lost tlast");
             iq_sink.tready = 1;
-            @(posedge clk);
+            @(posedge aclk);
             iq_sink.tready = 0;
         end
         $display("INFO: IQ stream passed through generic FIFO (32-bit) OK");
 
         // ---- 3) confirm the pixel pipeline is moving data ----------
-        repeat (40) @(posedge clk);
+        repeat (40) @(posedge aclk);
         assert (beats > 0)  else $fatal(1, "pixel pipeline produced no beats");
         assert (sof_seen)   else $fatal(1, "no start-of-frame observed");
         $display("INFO: pixel pipeline beats = %0d", beats);

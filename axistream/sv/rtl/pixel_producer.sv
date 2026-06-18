@@ -1,15 +1,15 @@
+`timescale 1ns/1ps
 // =====================================================================
-// pixel_producer.sv - builds RGB pixels, drives an axis_if.tx
+// pixel_producer.sv - builds RGB pixels, drives an axis_if.master
 // =====================================================================
 // Assigning a pixel_t straight onto m.tdata IS the "pack" - no helper
-// function needed, because pixel_t is a packed struct.
+// function needed, because pixel_t is a packed struct.  Clock/reset come
+// from the interface (m.aclk / m.aresetn, active-low async).
 // =====================================================================
 module pixel_producer #(
     parameter int LINE = 8        // pixels per line; tlast at end of line
 ) (
-    input logic clk,
-    input logic rst,
-    axis_if.tx  m                 // m.tdata is pixel_t (from the instance)
+    axis_if.master m              // m.tdata is pixel_t (from the instance)
 );
     import stream_pkg::*;
 
@@ -27,9 +27,14 @@ module pixel_producer #(
     assign m.tdata  = px;         // packed struct -> bus, automatically
     assign m.tvalid = 1'b1;
     assign m.tlast  = (cnt == LINE-1);
+    assign m.tuser  = '0;         // unused sidebands - tie low
+    assign m.tid    = '0;
+    assign m.tdest  = '0;
+    assign m.tkeep  = '0;
+    assign m.tstrb  = '0;
 
-    always_ff @(posedge clk) begin
-        if (rst) begin
+    always_ff @(posedge m.aclk or negedge m.aresetn) begin
+        if (!m.aresetn) begin
             cnt  <= '0;
             seed <= '0;
         end else if (m.tready) begin   // advance only on an accepted beat
