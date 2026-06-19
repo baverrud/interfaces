@@ -15,7 +15,8 @@ FPGA interface definitions using SystemVerilog (`_if.sv`) and VHDL-2019
 | **APB** | `apb/sv/rtl/apb_if.sv` | `apb/vhdl/rtl/apb_pkg.vhd` |
 | **Wishbone** | `wishbone/sv/rtl/wishbone_if.sv` | `wishbone/vhdl/rtl/wishbone_pkg.vhd` |
 | **SBI** | `sbi/sv/rtl/sbi_if.sv` | `sbi/vhdl/rtl/sbi_pkg.vhd` |
-| **SPI / QSPI** | `spi/sv/rtl/spi_if.sv` | `spi/vhdl/rtl/spi_pkg.vhd` |
+| **SPI** | `spi/sv/rtl/spi_if.sv` | `spi/vhdl/rtl/spi_pkg.vhd` |
+| **QSPI** | `qspi/sv/rtl/qspi_if.sv` | `qspi/vhdl/rtl/qspi_pkg.vhd` |
 | **I2C** | `i2c/sv/rtl/i2c_if.sv` | `i2c/vhdl/rtl/i2c_pkg.vhd` |
 | **I2S** | `i2s/sv/rtl/i2s_if.sv` | `i2s/vhdl/rtl/i2s_pkg.vhd` |
 | **UART** | `uart/sv/rtl/uart_if.sv` | `uart/vhdl/rtl/uart_pkg.vhd` |
@@ -39,7 +40,8 @@ interfaces/
 ├── apb/                  ← APB (interface only)
 ├── wishbone/             ← Wishbone (interface only)
 ├── sbi/                  ← SBI (interface only)
-├── spi/                  ← SPI/QSPI (interface only)
+├── spi/                  ← SPI (classic MOSI/MISO)
+├── qspi/                 ← QSPI (dual/quad/octal IO)
 ├── i2c/                  ← I2C (interface only)
 ├── i2s/                  ← I2S (interface only)
 ├── uart/                 ← UART (interface only)
