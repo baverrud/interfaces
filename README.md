@@ -6,22 +6,22 @@ FPGA interface definitions using SystemVerilog (`_if.sv`) and VHDL-2019
 
 ## Interfaces
 
-| Protocol | SV | VHDL | Type | Configurable |
-|---|---|---|---|---|
-| **AXI4-Stream** | `axistream/sv/rtl/axis_if.sv` | `axistream/vhdl/rtl/stream_pkg.vhd` | Streaming | Payload type, sideband widths |
-| **AXI4** | `axi4/sv/rtl/axi4_if.sv` | `axi4/vhdl/rtl/axi4_pkg.vhd` | Memory-mapped | DATA_W, ADDR_W, ID_W, USER_W |
-| **AXI3** | `axi3/sv/rtl/axi3_if.sv` | `axi3/vhdl/rtl/axi3_pkg.vhd` | Memory-mapped | DATA_W, ADDR_W, ID_W, USER_W |
-| **AXI4-Lite** | `axilite/sv/rtl/axilite_if.sv` | `axilite/vhdl/rtl/axilite_pkg.vhd` | Memory-mapped | DATA_W, ADDR_W, USER_W |
-| **APB** | `apb/sv/rtl/apb_if.sv` | `apb/vhdl/rtl/apb_pkg.vhd` | Memory-mapped | DATA_W, ADDR_W |
-| **Wishbone** | `wishbone/sv/rtl/wishbone_if.sv` | `wishbone/vhdl/rtl/wishbone_pkg.vhd` | Memory-mapped | DATA_W, ADDR_W |
-| **SBI** | `sbi/sv/rtl/sbi_if.sv` | `sbi/vhdl/rtl/sbi_pkg.vhd` | Register-access | ADDR_W, DATA_W |
-| **SPI / QSPI** | `spi/sv/rtl/spi_if.sv` | `spi/vhdl/rtl/spi_pkg.vhd` | Serial | CS_COUNT, DATA_LINES |
-| **I2C** | `i2c/sv/rtl/i2c_if.sv` | `i2c/vhdl/rtl/i2c_pkg.vhd` | Serial (inout) | — |
-| **I2S** | `i2s/sv/rtl/i2s_if.sv` | `i2s/vhdl/rtl/i2s_pkg.vhd` | Audio | DATA_W |
-| **UART** | `uart/sv/rtl/uart_if.sv` | `uart/vhdl/rtl/uart_pkg.vhd` | Serial | HAS_RTS_CTS |
-| **CAN** | `can/sv/rtl/can_if.sv` | `can/vhdl/rtl/can_pkg.vhd` | Serial | — |
-| **MDIO** | `mdio/sv/rtl/mdio_if.sv` | `mdio/vhdl/rtl/mdio_pkg.vhd` | Management (inout) | — |
-| **JTAG** | `jtag/sv/rtl/jtag_if.sv` | `jtag/vhdl/rtl/jtag_pkg.vhd` | Debug | HAS_TRST |
+| Protocol | SV | VHDL |
+|---|---|---|
+| **AXI4-Stream** | `axistream/sv/rtl/axis_if.sv` | `axistream/vhdl/rtl/stream_pkg.vhd` |
+| **AXI4** | `axi4/sv/rtl/axi4_if.sv` | `axi4/vhdl/rtl/axi4_pkg.vhd` |
+| **AXI3** | `axi3/sv/rtl/axi3_if.sv` | `axi3/vhdl/rtl/axi3_pkg.vhd` |
+| **AXI4-Lite** | `axilite/sv/rtl/axilite_if.sv` | `axilite/vhdl/rtl/axilite_pkg.vhd` |
+| **APB** | `apb/sv/rtl/apb_if.sv` | `apb/vhdl/rtl/apb_pkg.vhd` |
+| **Wishbone** | `wishbone/sv/rtl/wishbone_if.sv` | `wishbone/vhdl/rtl/wishbone_pkg.vhd` |
+| **SBI** | `sbi/sv/rtl/sbi_if.sv` | `sbi/vhdl/rtl/sbi_pkg.vhd` |
+| **SPI / QSPI** | `spi/sv/rtl/spi_if.sv` | `spi/vhdl/rtl/spi_pkg.vhd` |
+| **I2C** | `i2c/sv/rtl/i2c_if.sv` | `i2c/vhdl/rtl/i2c_pkg.vhd` |
+| **I2S** | `i2s/sv/rtl/i2s_if.sv` | `i2s/vhdl/rtl/i2s_pkg.vhd` |
+| **UART** | `uart/sv/rtl/uart_if.sv` | `uart/vhdl/rtl/uart_pkg.vhd` |
+| **CAN** | `can/sv/rtl/can_if.sv` | `can/vhdl/rtl/can_pkg.vhd` |
+| **MDIO** | `mdio/sv/rtl/mdio_if.sv` | `mdio/vhdl/rtl/mdio_pkg.vhd` |
+| **JTAG** | `jtag/sv/rtl/jtag_if.sv` | `jtag/vhdl/rtl/jtag_pkg.vhd` |
 
 Full AXI signal reference: [`common/wrappers/README.md`](common/wrappers/README.md)
 
