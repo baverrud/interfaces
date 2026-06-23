@@ -20,11 +20,11 @@
 #
 # ---- File list ------------------------------------------------------
 design  ../../../lib/vhdl/stream_pkg.vhd
-design  ../../../common/axistream_pkg/rtl/payload_pkg.vhd
-design  ../../../common/sync_fifo/rtl/sync_fifo.vhd
-design  ../../../common/stream_fifo/rtl/stream_fifo.vhd
-design  ../../../common/pixel/rtl/pixel_producer.vhd
-design  ../../../common/pixel/rtl/pixel_consumer.vhd
+design  ../../../common/hdl/axistream_pkg/payload_pkg.vhd
+design  ../../../common/hdl/sync_fifo/sync_fifo.vhd
+design  ../../../common/hdl/stream_fifo/stream_fifo.vhd
+design  ../../../common/hdl/pixel/pixel_producer.vhd
+design  ../../../common/hdl/pixel/pixel_consumer.vhd
 design  ../rtl/top.vhd
 sim     ../tb/top_tb.vhd
 

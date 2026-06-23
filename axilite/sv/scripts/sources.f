@@ -2,7 +2,7 @@
 # sources.f - AXI4-Lite project source manifest
 # =====================================================================
 design  ../../../lib/sv/axilite_if.sv
-design  ../../../common/axil_reg/rtl/axil_reg.sv
+design  ../../../common/hdl/axil_reg/axil_reg.sv
 design  ../rtl/top.sv
 sim     ../tb/top_tb.sv
 

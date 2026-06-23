@@ -34,11 +34,12 @@ interfaces/
 │   ├── sv/               ← *_if.sv (15 protocols)
 │   └── vhdl/             ← *_pkg.vhd (15 protocols)
 ├── common/               ← reusable helpers + tooling
-│   ├── sync_fifo/rtl/    ← synchronous FIFO (SV + VHDL)
-│   ├── stream_fifo/rtl/  ← AXI-Stream FIFO wrapper
-│   ├── axistream_pkg/rtl/← companion stream parameter packages
-│   ├── axil_reg/rtl/     ← AXI4-Lite register slave
-│   ├── pixel/rtl/        ← stream producer/consumer demos
+│   ├── hdl/              ← helper module library
+│   │   ├── sync_fifo/    ← synchronous FIFO (SV + VHDL)
+│   │   ├── stream_fifo/  ← AXI-Stream FIFO wrapper
+│   │   ├── axistream_pkg/← companion stream parameter packages
+│   │   ├── axil_reg/     ← AXI4-Lite register slave
+│   │   └── pixel/        ← stream producer/consumer demos
 │   ├── scripts/          ← shared engine.bat + Tcl
 │   └── wrappers/         ← Zynq PS wrapper reference
 ├── axistream/            ← demo: pixel pipeline (SV + VHDL)

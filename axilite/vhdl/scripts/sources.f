@@ -2,7 +2,7 @@
 # sources.f - AXI4-Lite VHDL project source manifest
 # =====================================================================
 design  ../../../lib/vhdl/axilite_pkg.vhd
-design  ../../../common/axil_reg/rtl/axil_reg.vhd
+design  ../../../common/hdl/axil_reg/axil_reg.vhd
 design  ../rtl/top.vhd
 sim     ../tb/top_tb.vhd
 

@@ -20,11 +20,11 @@
 #
 # ---- File list ------------------------------------------------------
 design  ../../../lib/sv/axis_if.sv
-design  ../../../common/axistream_pkg/rtl/stream_pkg.sv
-design  ../../../common/sync_fifo/rtl/sync_fifo.sv
-design  ../../../common/stream_fifo/rtl/stream_fifo.sv
-design  ../../../common/pixel/rtl/pixel_producer.sv
-design  ../../../common/pixel/rtl/pixel_consumer.sv
+design  ../../../common/hdl/axistream_pkg/stream_pkg.sv
+design  ../../../common/hdl/sync_fifo/sync_fifo.sv
+design  ../../../common/hdl/stream_fifo/stream_fifo.sv
+design  ../../../common/hdl/pixel/pixel_producer.sv
+design  ../../../common/hdl/pixel/pixel_consumer.sv
 design  ../rtl/top.sv
 sim     ../tb/top_tb.sv
 
