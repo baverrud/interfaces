@@ -35,18 +35,14 @@ interfaces/
 │   └── vhdl/             ← *_pkg.vhd (15 protocols)
 ├── common/               ← reusable helpers + tooling
 │   ├── hdl/              ← helper module library
-│   │   ├── sync_fifo/    ← synchronous FIFO (SV + VHDL)
-│   │   ├── stream_fifo/  ← AXI-Stream FIFO wrapper
-│   │   ├── axistream_pkg/← companion stream parameter packages
-│   │   ├── axil_reg/     ← AXI4-Lite register slave
-│   │   └── pixel/        ← stream producer/consumer demos
 │   ├── scripts/          ← shared engine.bat + Tcl
 │   └── wrappers/         ← Zynq PS wrapper reference
-├── axistream/            ← demo: pixel pipeline (SV + VHDL)
-├── axi4/                 ← demo: burst write/read master + slave
-├── axi3/                 ← interface only (no demo yet)
-├── axilite/              ← demo: register access
-├── apb/ ...              ← interface only
+└── examples/             ← demo projects
+    ├── axi4/             ← burst write/read master + slave
+    ├── axistream/        ← pixel pipeline (SV + VHDL)
+    ├── axilite/          ← register access demo
+    ├── axi3/             ← interface only (no demo yet)
+    ├── apb/ ...          ← interface only
 ```
 
 Each demo project follows a consistent layout:
@@ -67,7 +63,7 @@ Each demo project follows a consistent layout:
     └── viv/              ← Vivado project output (gitignored)
 ```
 
-Paths in `sources.f` reference `../../../lib/` and `../../../common/` from the
+Paths in `sources.f` reference `../../../../lib/` and `../../../../common/` from the
 `scripts/` directory.  All Tcl scripts normalize paths via `file normalize`.
 
 ### Script usage
