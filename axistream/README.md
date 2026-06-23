@@ -7,26 +7,25 @@ interfaces and FIFOs.
 
 | File | Description |
 |------|-------------|
-| `sv/rtl/stream_pkg.sv` | Packed struct types: `pixel_t` (25-bit RGB+SOF), `iq_t` (32-bit complex) |
-| `sv/rtl/axis_if.sv` | Parameterized AXI-Stream interface with tx/rx modports |
-| `sv/rtl/sync_fifo.sv` | Type-generic first-word fall-through synchronous FIFO |
-| `sv/rtl/stream_fifo.sv` | AXI-Stream wrapper around `sync_fifo` |
-| `sv/rtl/pixel_producer.sv` | RGB pixel stream source |
-| `sv/rtl/pixel_consumer.sv` | RGB pixel stream sink |
+| `../../../common/axistream_pkg/rtl/stream_pkg.sv` | Packed struct types: `pixel_t` (25-bit RGB+SOF), `iq_t` (32-bit complex) |
+| `../../../lib/sv/axis_if.sv` | Parameterized AXI-Stream interface with tx/rx modports |
+| `../../../common/sync_fifo/rtl/sync_fifo.sv` | Type-generic first-word fall-through synchronous FIFO |
+| `../../../common/stream_fifo/rtl/stream_fifo.sv` | AXI-Stream wrapper around `sync_fifo` |
+| `../../../common/pixel/rtl/pixel_producer.sv` | RGB pixel stream source |
+| `../../../common/pixel/rtl/pixel_consumer.sv` | RGB pixel stream sink |
 | `sv/rtl/top.sv` | Synthesizable top: producer → stream_fifo → consumer |
 | `sv/tb/top_tb.sv` | Self-checking testbench (pack/unpack round-trips, IQ FIFO, pixel pipeline) |
 
 ## Scripts
 
-Located in `sv/scripts/`:
-
 | Command | Description |
 |---------|-------------|
-| `sim.bat` | Batch simulation (library mode) |
-| `sim_gui.bat` | GUI simulation with waves |
-| `sim_prj.bat` | GUI simulation (ModelSim project mode) |
-| `viv.bat` | Batch Vivado (synth + sim, then exit) |
-| `viv_gui.bat` | GUI Vivado project |
+| `sim top_tb` | Batch simulation |
+| `sim top_tb gui` | GUI simulation |
+| `sim top_tb prj` | GUI simulation (ModelSim project mode) |
+| `sim all` | Batch simulate all testbenches |
+| `synth top` | Batch Vivado synthesis |
+| `synth top gui` | Vivado GUI synthesis |
 
 ## Configuration
 

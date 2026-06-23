@@ -47,7 +47,22 @@ foreach line [read_sources [file join $PROJ_DIR sources.f]] {
     }
 }
 
+# ---- Command-line / env override for top testbench ------------------
+# sim.bat/synth.bat pass SIM_TOP_OVERRIDE to run a different testbench
+# without editing sources.f.  Project mode handles a single top only.
+if {[info exists ::env(SIM_TOP_OVERRIDE)] && $::env(SIM_TOP_OVERRIDE) ne ""} {
+    if {$::env(SIM_TOP_OVERRIDE) eq "all"} {
+        error "project mode (prj) supports a single testbench only, not 'all'"
+    }
+    set TOP $::env(SIM_TOP_OVERRIDE)
+    puts "INFO: top overridden via SIM_TOP_OVERRIDE = $TOP"
+}
+
+# Normalize all source paths (ModelSim vlog can't handle '..' in paths)
 set SOURCES [concat $DESIGN_FILES $SIM_FILES]
+set SOURCES_NORM {}
+foreach f $SOURCES { lappend SOURCES_NORM [file normalize [file join $PROJ_DIR $f]] }
+set SOURCES $SOURCES_NORM
 
 # ---- Work in the project output directory ----------------------------
 catch {project close}

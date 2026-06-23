@@ -45,9 +45,17 @@ foreach line [read_sources [file join $PROJ_DIR sources.f]] {
     }
 }
 
+# ---- Command-line / env override for top testbench ------------------
+# sim.bat can pass SIM_TOP_OVERRIDE to run a different testbench without
+# editing sources.f.  If set, it replaces the TOP read from sources.f.
+if {[info exists ::env(SIM_TOP_OVERRIDE)] && $::env(SIM_TOP_OVERRIDE) ne ""} {
+    set TOP $::env(SIM_TOP_OVERRIDE)
+    puts "INFO: top overridden via SIM_TOP_OVERRIDE = $TOP"
+}
+
 set SOURCES {}
 foreach f [concat $DESIGN_FILES $SIM_FILES] {
-    lappend SOURCES [file join $PROJ_DIR $f]
+    lappend SOURCES [file normalize [file join $PROJ_DIR $f]]
 }
 
 # ---- Work in the simulation output directory -------------------------
@@ -79,14 +87,27 @@ foreach f $SOURCES {
     compile_file $f
 }
 
-# ---- Elaborate + simulate -------------------------------------------
-vsim -voptargs=+acc -onfinish stop $WORK_LIB.$TOP
+# ---- Build list of simulation tops (for 'all') ----------------------
+# Each testbench top is the basename of its source file.
+set SIM_TOPS {}
+foreach f $SIM_FILES { lappend SIM_TOPS [file rootname [file tail $f]] }
 
-if {[info exists GUI] && $GUI} {
-    add wave -r /*
+set GUI_ON [expr {[info exists GUI] && $GUI}]
+
+proc run_one {lib top gui} {
+    puts "INFO: ===== simulating $top ====="
+    vsim -voptargs=+acc -onfinish stop $lib.$top
+    if {$gui} { add wave -r /* }
+    run -all
 }
 
-run -all
+# ---- Elaborate + simulate -------------------------------------------
+if {$TOP eq "all"} {
+    puts "INFO: ---- simulating ALL testbenches ----"
+    foreach t $SIM_TOPS { run_one $WORK_LIB $t $GUI_ON }
+} else {
+    run_one $WORK_LIB $TOP $GUI_ON
+}
 
 puts "INFO: ModelSim simulation finished."
 

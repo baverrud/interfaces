@@ -53,17 +53,51 @@ foreach line [read_sources [file join $PROJ_DIR sources.f]] {
 # Synthesis top is the design module (same as name, without "tb_" prefix)
 set TOP_SYNTH $PROJ_NAME
 
+# ---- Run mode from argv ---------------------------------------------
+#   -synth  synthesize only            -sim   simulate only
+#   -run    legacy: RTL elab + sim     -all   iterate all tops/testbenches
+#   -gui    keep project/sim open (do not close at end)
+set MODE_SYNTH [expr {[lsearch -exact $argv "-synth"] >= 0}]
+set MODE_SIM   [expr {[lsearch -exact $argv "-sim"]   >= 0}]
+set MODE_RUN   [expr {[lsearch -exact $argv "-run"]   >= 0}]
+set MODE_ALL   [expr {[lsearch -exact $argv "-all"]   >= 0}]
+set MODE_GUI   [expr {[lsearch -exact $argv "-gui"]   >= 0}]
+
+# ---- Command-line / env override for top module ----------------------
+# sim.bat/synth.bat pass VIV_TOP_OVERRIDE to target a specific top
+# without editing sources.f.  Ignored when -all is given.
+if {!$MODE_ALL && [info exists ::env(VIV_TOP_OVERRIDE)] && \
+        $::env(VIV_TOP_OVERRIDE) ne "" && $::env(VIV_TOP_OVERRIDE) ne "all"} {
+    set TOP_SIM $::env(VIV_TOP_OVERRIDE)
+    puts "INFO: top overridden via VIV_TOP_OVERRIDE = $TOP_SIM"
+}
+
+# ---- Build the list of simulation tops ------------------------------
+# A simulation top is a testbench (basename of a 'sim' file).  The
+# matching synthesis top is the same name with a trailing "_tb" removed.
+set SIM_TOPS {}
+foreach f $SIM_FILES { lappend SIM_TOPS [file rootname [file tail $f]] }
+
+set TARGETS {}
+if {$MODE_ALL} {
+    if {$MODE_SIM} {
+        set TARGETS $SIM_TOPS
+    } else {
+        foreach t $SIM_TOPS {
+            set st [regsub {_tb$} $t ""]
+            if {[lsearch -exact $TARGETS $st] < 0} { lappend TARGETS $st }
+        }
+    }
+} else {
+    lappend TARGETS $TOP_SIM
+}
+
 set DESIGN_SOURCES {}
-foreach f $DESIGN_FILES { lappend DESIGN_SOURCES [file join $PROJ_DIR $f] }
+foreach f $DESIGN_FILES { lappend DESIGN_SOURCES [file normalize [file join $PROJ_DIR $f]] }
 set SIM_SOURCES {}
-foreach f $SIM_FILES    { lappend SIM_SOURCES    [file join $PROJ_DIR $f] }
+foreach f $SIM_FILES    { lappend SIM_SOURCES    [file normalize [file join $PROJ_DIR $f]] }
 
-# ---- Create Vivado project ------------------------------------------
-set PROJ_DIR_OUT [file normalize [file join $PROJ_DIR $VIVDIR $PROJ_NAME]]
-file mkdir $PROJ_DIR_OUT
-create_project -force $PROJ_NAME $PROJ_DIR_OUT -part $PART
-
-# ---- Add and configure design sources -------------------------------
+# ---- File-type helper -----------------------------------------------
 proc vivado_file_type {f} {
     switch -- [file extension $f] {
         .sv     { return SystemVerilog }
@@ -74,49 +108,65 @@ proc vivado_file_type {f} {
     }
 }
 
-add_files -fileset sources_1 $DESIGN_SOURCES
-foreach f $DESIGN_SOURCES {
-    set_property file_type [vivado_file_type $f] [get_files [file tail $f]]
-}
-set_property top $TOP_SYNTH [get_filesets sources_1]
+# ---- Create + configure a project for one (synth, sim) top pair ------
+proc build_project {proj_name top_synth top_sim} {
+    global DESIGN_SOURCES SIM_SOURCES PROJ_DIR VIVDIR PART
+    set out [file normalize [file join $PROJ_DIR $VIVDIR $proj_name]]
+    file mkdir $out
+    create_project -force $proj_name $out -part $PART
 
-# ---- Add and configure simulation testbench -------------------------
-add_files -fileset sim_1 $SIM_SOURCES
-foreach f $SIM_SOURCES {
-    set_property file_type [vivado_file_type $f] [get_files [file tail $f]]
-}
-set_property top $TOP_SIM [get_filesets sim_1]
-set_property top_lib xil_defaultlib [get_filesets sim_1]
+    add_files -fileset sources_1 $DESIGN_SOURCES
+    foreach f $DESIGN_SOURCES {
+        set_property file_type [vivado_file_type $f] [get_files [file tail $f]]
+    }
+    set_property top $top_synth [get_filesets sources_1]
 
-update_compile_order -fileset sources_1
-update_compile_order -fileset sim_1
+    add_files -fileset sim_1 $SIM_SOURCES
+    foreach f $SIM_SOURCES {
+        set_property file_type [vivado_file_type $f] [get_files [file tail $f]]
+    }
+    set_property top $top_sim [get_filesets sim_1]
+    set_property top_lib xil_defaultlib [get_filesets sim_1]
 
-puts "INFO: Project '$PROJ_NAME' created at $PROJ_DIR_OUT"
-puts "INFO: Synthesis top = $TOP_SYNTH"
-puts "INFO: Simulation top = $TOP_SIM"
-
-# ---- Optionally run the flows ---------------------------------------
-# Pass -run on the command line:  vivado -mode batch ... -tclargs -run
-set RUN_FLOWS 0
-if {[lsearch -exact $argv "-run"] >= 0} {
-    set RUN_FLOWS 1
+    update_compile_order -fileset sources_1
+    update_compile_order -fileset sim_1
+    puts "INFO: project '$proj_name' created (synth=$top_synth sim=$top_sim)"
 }
 
-if {$RUN_FLOWS} {
-    puts "INFO: ---- Running RTL elaboration / synthesis ----"
-    # VHDL-2019 mode views (view/alias ...'converse) are not supported by
-    # Vivado synthesis; catch the error so simulation still runs.
-    if {[catch { synth_design -rtl -name rtl_${PROJ_NAME} }]} {
-        puts "WARNING: RTL elaboration failed (VHDL-2019 constructs may not be\
-               synthesizable in Vivado) — skipping to simulation."
-    } else {
-        puts "SYNTH: top ports = [llength [get_ports]]"
+# ---- Process every target -------------------------------------------
+set FAIL 0
+foreach tgt $TARGETS {
+    set top_sim   $tgt
+    set top_synth [regsub {_tb$} $tgt ""]
+    set proj_name $top_synth
+    puts "INFO: ===== target $tgt (synth=$top_synth) ====="
+    build_project $proj_name $top_synth $top_sim
+
+    # -- synthesis (skipped in GUI mode: leave project open for the user)
+    if {($MODE_SYNTH || $MODE_RUN) && !$MODE_GUI} {
+        puts "INFO: ---- synthesis: $top_synth ----"
+        if {[catch { synth_design -top $top_synth } emsg]} {
+            puts "ERROR: synthesis failed for $top_synth: $emsg"
+            set FAIL 1
+        } else {
+            puts "SYNTH: $top_synth OK ([llength [get_ports]] ports)"
+        }
     }
 
-    puts "INFO: ---- Running behavioral simulation ----"
-    launch_simulation
-    puts "INFO: Simulation finished."
-    close_sim -force
-    close_project -quiet
+    # -- behavioral simulation
+    if {$MODE_SIM || $MODE_RUN} {
+        puts "INFO: ---- simulation: $top_sim ----"
+        if {[catch { launch_simulation } emsg]} {
+            puts "ERROR: simulation failed for $top_sim: $emsg"
+            set FAIL 1
+        }
+        if {!$MODE_GUI} { catch {close_sim -force} }
+    }
+
+    if {!$MODE_GUI} { close_project -quiet }
+}
+
+if {!$MODE_GUI} {
+    if {$FAIL} { puts "RESULT: FAIL" } else { puts "RESULT: PASS" }
     puts "INFO: Done."
 }

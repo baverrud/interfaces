@@ -6,6 +6,24 @@
 **/sim/
 **/viv/
 
+# ModelSim / Questa run logs
+transcript
+vsim_check.log
+vsim.wlf
+*.wlf
+
+# Vivado temp files
+vivado*.jou
+vivado*.log
+*.str
+dfx_runtime.txt
+*.backup.jou
+*.backup.log
+.Xil/
+
+# Python virtual environment
+.venv/
+
 # Windows
 Thumbs.db
 desktop.ini

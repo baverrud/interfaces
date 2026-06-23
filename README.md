@@ -8,21 +8,21 @@ FPGA interface definitions using SystemVerilog (`_if.sv`) and VHDL-2019
 
 | Protocol | SV | VHDL |
 |---|---|---|
-| **AXI4-Stream** | `axistream/sv/rtl/axis_if.sv` | `axistream/vhdl/rtl/stream_pkg.vhd` |
-| **AXI4** | `axi4/sv/rtl/axi4_if.sv` | `axi4/vhdl/rtl/axi4_pkg.vhd` |
-| **AXI3** | `axi3/sv/rtl/axi3_if.sv` | `axi3/vhdl/rtl/axi3_pkg.vhd` |
-| **AXI4-Lite** | `axilite/sv/rtl/axilite_if.sv` | `axilite/vhdl/rtl/axilite_pkg.vhd` |
-| **APB** | `apb/sv/rtl/apb_if.sv` | `apb/vhdl/rtl/apb_pkg.vhd` |
-| **Wishbone** | `wishbone/sv/rtl/wishbone_if.sv` | `wishbone/vhdl/rtl/wishbone_pkg.vhd` |
-| **SBI** | `sbi/sv/rtl/sbi_if.sv` | `sbi/vhdl/rtl/sbi_pkg.vhd` |
-| **SPI** | `spi/sv/rtl/spi_if.sv` | `spi/vhdl/rtl/spi_pkg.vhd` |
-| **QSPI** | `qspi/sv/rtl/qspi_if.sv` | `qspi/vhdl/rtl/qspi_pkg.vhd` |
-| **I2C** | `i2c/sv/rtl/i2c_if.sv` | `i2c/vhdl/rtl/i2c_pkg.vhd` |
-| **I2S** | `i2s/sv/rtl/i2s_if.sv` | `i2s/vhdl/rtl/i2s_pkg.vhd` |
-| **UART** | `uart/sv/rtl/uart_if.sv` | `uart/vhdl/rtl/uart_pkg.vhd` |
-| **CAN** | `can/sv/rtl/can_if.sv` | `can/vhdl/rtl/can_pkg.vhd` |
-| **MDIO** | `mdio/sv/rtl/mdio_if.sv` | `mdio/vhdl/rtl/mdio_pkg.vhd` |
-| **JTAG** | `jtag/sv/rtl/jtag_if.sv` | `jtag/vhdl/rtl/jtag_pkg.vhd` |
+| **AXI4-Stream** | `lib/sv/axis_if.sv` | `lib/vhdl/stream_pkg.vhd` |
+| **AXI4** | `lib/sv/axi4_if.sv` | `lib/vhdl/axi4_pkg.vhd` |
+| **AXI3** | `lib/sv/axi3_if.sv` | `lib/vhdl/axi3_pkg.vhd` |
+| **AXI4-Lite** | `lib/sv/axilite_if.sv` | `lib/vhdl/axilite_pkg.vhd` |
+| **APB** | `lib/sv/apb_if.sv` | `lib/vhdl/apb_pkg.vhd` |
+| **Wishbone** | `lib/sv/wishbone_if.sv` | `lib/vhdl/wishbone_pkg.vhd` |
+| **SBI** | `lib/sv/sbi_if.sv` | `lib/vhdl/sbi_pkg.vhd` |
+| **SPI** | `lib/sv/spi_if.sv` | `lib/vhdl/spi_pkg.vhd` |
+| **QSPI** | `lib/sv/qspi_if.sv` | `lib/vhdl/qspi_pkg.vhd` |
+| **I2C** | `lib/sv/i2c_if.sv` | `lib/vhdl/i2c_pkg.vhd` |
+| **I2S** | `lib/sv/i2s_if.sv` | `lib/vhdl/i2s_pkg.vhd` |
+| **UART** | `lib/sv/uart_if.sv` | `lib/vhdl/uart_pkg.vhd` |
+| **CAN** | `lib/sv/can_if.sv` | `lib/vhdl/can_pkg.vhd` |
+| **MDIO** | `lib/sv/mdio_if.sv` | `lib/vhdl/mdio_pkg.vhd` |
+| **JTAG** | `lib/sv/jtag_if.sv` | `lib/vhdl/jtag_pkg.vhd` |
 
 Full AXI signal reference: [`common/wrappers/README.md`](common/wrappers/README.md)
 
@@ -30,43 +30,64 @@ Full AXI signal reference: [`common/wrappers/README.md`](common/wrappers/README.
 
 ```
 interfaces/
-├── common/
-│   ├── scripts/          ← shared Tcl (modelsim.tcl, vivado.tcl)
-│   └── wrappers/         ← Zynq PS wrapper reference + AXI signal table
-├── axistream/            ← AXI-Stream (SV + VHDL, demo pipeline)
-├── axi4/                 ← AXI4 (interface + VHDL demo)
-├── axi3/                 ← AXI3 (interface only)
-├── axilite/              ← AXI4-Lite (interface + SV demo)
-├── apb/                  ← APB (interface only)
-├── wishbone/             ← Wishbone (interface only)
-├── sbi/                  ← SBI (interface only)
-├── spi/                  ← SPI (classic MOSI/MISO)
-├── qspi/                 ← QSPI (dual/quad/octal IO)
-├── i2c/                  ← I2C (interface only)
-├── i2s/                  ← I2S (interface only)
-├── uart/                 ← UART (interface only)
-├── can/                  ← CAN (interface only)
-├── mdio/                 ← MDIO (interface only)
-└── jtag/                 ← JTAG (interface only)
+├── lib/                  ← interface definitions (reusable IP)
+│   ├── sv/               ← *_if.sv (15 protocols)
+│   └── vhdl/             ← *_pkg.vhd (15 protocols)
+├── common/               ← reusable helpers + tooling
+│   ├── sync_fifo/rtl/    ← synchronous FIFO (SV + VHDL)
+│   ├── stream_fifo/rtl/  ← AXI-Stream FIFO wrapper
+│   ├── axistream_pkg/rtl/← companion stream parameter packages
+│   ├── axil_reg/rtl/     ← AXI4-Lite register slave
+│   ├── pixel/rtl/        ← stream producer/consumer demos
+│   ├── scripts/          ← shared engine.bat + Tcl
+│   └── wrappers/         ← Zynq PS wrapper reference
+├── axistream/            ← demo: pixel pipeline (SV + VHDL)
+├── axi4/                 ← demo: burst write/read master + slave
+├── axi3/                 ← interface only (no demo yet)
+├── axilite/              ← demo: register access
+├── apb/ ...              ← interface only
 ```
 
-Each sub-project follows a consistent layout:
+Each demo project follows a consistent layout:
 
 ```
 <proto>/
 ├── sv/
-│   ├── rtl/              ← SystemVerilog sources
+│   ├── rtl/              ← demo modules only (masters, slaves, tops)
 │   ├── tb/               ← testbenches
-│   ├── scripts/          ← sim.bat, viv.bat, sources.f
+│   ├── scripts/          ← sim.bat, synth.bat, sources.f
 │   ├── sim/              ← simulation output (gitignored)
 │   └── viv/              ← Vivado project output (gitignored)
 └── vhdl/
-    ├── rtl/              ← VHDL-2019 sources
+    ├── rtl/              ← demo modules only
     ├── tb/               ← testbenches
-    ├── scripts/          ← sim.bat, viv.bat, sources.f
+    ├── scripts/          ← sim.bat, synth.bat, sources.f
     ├── sim/              ← simulation output (gitignored)
     └── viv/              ← Vivado project output (gitignored)
 ```
+
+Paths in `sources.f` reference `../../../lib/` and `../../../common/` from the
+`scripts/` directory.  All Tcl scripts normalize paths via `file normalize`.
+
+### Script usage
+
+```
+sim   <tb|all>   [modelsim|xsim] [gui|prj]      # simulate
+synth <top|all>  [vivado]        [gui]           # synthesize
+```
+
+Examples:
+
+| Command | Action |
+|---------|--------|
+| `sim top_tb` | Batch simulate one testbench |
+| `sim all` | Batch simulate all testbenches |
+| `sim top_tb gui` | ModelSim GUI (library mode) |
+| `sim top_tb prj` | ModelSim GUI (project mode) |
+| `sim top_tb xsim` | Vivado xsim batch |
+| `synth top` | Synthesize one top |
+| `synth all` | Synthesize all tops |
+| `synth top gui` | Vivado GUI synthesis |
 
 ## Design Conventions
 
