@@ -19,18 +19,18 @@
 # =====================================================================
 #
 # ---- File list ------------------------------------------------------
-design  ../../../../lib/sv/axis_if.sv
-design  ../../../../common/hdl/axistream_pkg/stream_pkg.sv
-design  ../../../../common/hdl/sync_fifo/sync_fifo.sv
-design  ../../../../common/hdl/stream_fifo/stream_fifo.sv
-design  ../../../../common/hdl/pixel/pixel_producer.sv
-design  ../../../../common/hdl/pixel/pixel_consumer.sv
-design  ../rtl/top.sv
-sim     ../tb/top_tb.sv
+design  ../../../lib/sv/axis_if.sv
+design  ../../COMMON/axistream_pkg/stream_pkg.sv
+design  ../../COMMON/sync_fifo/sync_fifo.sv
+design  ../../COMMON/stream_fifo/stream_fifo.sv
+design  ../../COMMON/pixel/pixel_producer.sv
+design  ../../COMMON/pixel/pixel_consumer.sv
+design  rtl/top.sv
+sim     tb/top_tb.sv
 
 # ---- Configuration --------------------------------------------------
 top     top_tb
 name    top
 part    xc7s6cpga196-1
-simdir  ../sim
-vivdir  ../viv
+simdir  sim
+vivdir  viv

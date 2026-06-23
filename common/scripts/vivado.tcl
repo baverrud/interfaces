@@ -4,9 +4,7 @@
 # Creates a Vivado project under the project's vivdir/, adds sources,
 # and optionally runs synthesis + simulation.
 #
-# Usage:  run from the project root:
-#   scripts\viv.bat            (batch: synth + sim, then exit)
-#   scripts\viv_gui.bat        (GUI: create project, leave open)
+# Invoked by engine.py.  See common/scripts/engine.py --help.
 # =====================================================================
 
 # ---- Locate project root --------------------------------------------
@@ -64,8 +62,8 @@ set MODE_ALL   [expr {[lsearch -exact $argv "-all"]   >= 0}]
 set MODE_GUI   [expr {[lsearch -exact $argv "-gui"]   >= 0}]
 
 # ---- Command-line / env override for top module ----------------------
-# sim.bat/synth.bat pass VIV_TOP_OVERRIDE to target a specific top
-# without editing sources.f.  Ignored when -all is given.
+# engine.py passes VIV_TOP_OVERRIDE to target a specific top without
+# editing sources.f.  Ignored when -all is given.
 if {!$MODE_ALL && [info exists ::env(VIV_TOP_OVERRIDE)] && \
         $::env(VIV_TOP_OVERRIDE) ne "" && $::env(VIV_TOP_OVERRIDE) ne "all"} {
     set TOP_SIM $::env(VIV_TOP_OVERRIDE)

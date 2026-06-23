@@ -33,11 +33,11 @@ interfaces/
 ├── lib/                  ← interface definitions (reusable IP)
 │   ├── sv/               ← *_if.sv (15 protocols)
 │   └── vhdl/             ← *_pkg.vhd (15 protocols)
-├── common/               ← reusable helpers + tooling
-│   ├── hdl/              ← helper module library
-│   ├── scripts/          ← shared engine.bat + Tcl
+├── common/               ← reusable tooling
+│   ├── scripts/          ← shared engine.py + Tcl
 │   └── wrappers/         ← Zynq PS wrapper reference
 └── examples/             ← demo projects
+    ├── COMMON/           ← helper module library (was common/hdl)
     ├── axi4/             ← burst write/read master + slave
     ├── axistream/        ← pixel pipeline (SV + VHDL)
     ├── axilite/          ← register access demo
@@ -50,41 +50,88 @@ Each demo project follows a consistent layout:
 ```
 <proto>/
 ├── sv/
-│   ├── rtl/              ← demo modules only (masters, slaves, tops)
-│   ├── tb/               ← testbenches
-│   ├── scripts/          ← sim.bat, synth.bat, sources.f
-│   ├── sim/              ← simulation output (gitignored)
-│   └── viv/              ← Vivado project output (gitignored)
+│   ├── sim.bat / synth.bat  ← convenience wrappers (call engine.py)
+│   ├── sources.f            ← source manifest (paths relative to this dir)
+│   ├── rtl/                 ← demo modules only (masters, slaves, tops)
+│   ├── tb/                  ← testbenches
+│   ├── sim/                 ← simulation output (gitignored)
+│   └── viv/                 ← Vivado project output (gitignored)
 └── vhdl/
-    ├── rtl/              ← demo modules only
-    ├── tb/               ← testbenches
-    ├── scripts/          ← sim.bat, synth.bat, sources.f
-    ├── sim/              ← simulation output (gitignored)
-    └── viv/              ← Vivado project output (gitignored)
+    ├── sim.bat / synth.bat  ← convenience wrappers (call engine.py)
+    ├── sources.f            ← source manifest (paths relative to this dir)
+    ├── rtl/                 ← demo modules only
+    ├── tb/                  ← testbenches
+    ├── sim/                 ← simulation output (gitignored)
+    └── viv/                 ← Vivado project output (gitignored)
 ```
 
-Paths in `sources.f` reference `../../../../lib/` and `../../../../common/` from the
-`scripts/` directory.  All Tcl scripts normalize paths via `file normalize`.
+Paths in `sources.f` are relative to the file's own directory (project root):
+`../../../lib/` for the interface library (3 levels up to repo root),
+`../../COMMON/` for the shared helper modules (2 levels up to `examples/`).
+All Tcl scripts normalize paths via `file normalize`.
 
 ### Script usage
 
+Two ways to run:
+
+**1. Python (cross-platform)** — works everywhere:
+
 ```
-sim   <tb|all>   [modelsim|xsim] [gui|prj]      # simulate
-synth <top|all>  [vivado]        [gui]           # synthesize
+python common/scripts/engine.py <sim|synth> <proj_dir> <target> [options]
 ```
 
-Examples:
+| Position | Description |
+|----------|-------------|
+| `sim|synth` | Action: simulate or synthesize |
+| `proj_dir` | Path to the project root (`sv/`, `vhdl/`, or `.`) |
+| `target` | Testbench/top module name, or `all` for all targets |
+
+**2. Convenience wrappers** — Windows only, less typing:
+
+```
+cd <project>\sv
+sim top_tb
+synth top
+```
+
+Each project root has `sim.bat` and `synth.bat` that forward to `engine.py`
+automatically.  From any `sv/` or `vhdl/` directory:
 
 | Command | Action |
 |---------|--------|
-| `sim top_tb` | Batch simulate one testbench |
+| `sim top_tb` | Batch simulate, ModelSim (default) |
 | `sim all` | Batch simulate all testbenches |
-| `sim top_tb gui` | ModelSim GUI (library mode) |
-| `sim top_tb prj` | ModelSim GUI (project mode) |
-| `sim top_tb xsim` | Vivado xsim batch |
-| `synth top` | Synthesize one top |
-| `synth all` | Synthesize all tops |
-| `synth top gui` | Vivado GUI synthesis |
+| `sim top_tb -b xsim` | Batch simulate, Vivado xsim |
+| `sim top_tb -g` | ModelSim GUI (library mode) |
+| `sim top_tb -p` | ModelSim GUI (project mode) |
+| `synth top` | Batch synthesize, Vivado (default) |
+| `synth all` | Batch synthesize all tops |
+| `synth top -g` | Vivado GUI synthesis |
+
+Python equivalent (cross-platform, works from anywhere):
+
+| Command | Action |
+|---------|--------|
+| `python common/scripts/engine.py sim sv top_tb` | Batch simulate, ModelSim |
+| `python common/scripts/engine.py sim sv all` | Batch simulate all |
+| `python common/scripts/engine.py sim sv top_tb -b xsim` | Batch simulate, Vivado xsim |
+| `python common/scripts/engine.py sim sv top_tb -g` | ModelSim GUI |
+| `python common/scripts/engine.py sim sv top_tb -p` | ModelSim project mode |
+| `python common/scripts/engine.py synth vhdl top` | Batch synthesize |
+| `python common/scripts/engine.py synth vhdl all` | Batch synthesize all |
+| `python common/scripts/engine.py synth vhdl top -g` | Vivado GUI |
+
+Options (same for both methods):
+
+| Option | Description |
+|--------|-------------|
+| `-b modelsim` | Simulate with ModelSim/Questa (default for sim) |
+| `-b vivado` / `-b xsim` | Simulate / synthesize with Vivado (default for synth) |
+| `-g` / `--gui` | Launch the tool GUI (single target only) |
+| `-p` / `--prj` | ModelSim project-mode GUI (implies `--gui`; ModelSim only) |
+
+Flag conventions: single-dash short flags (`-g`) are compact; double-dash long flags (`--gui`, `--prj`) are self-documenting.
+You can use either form (`-p` and `--prj` are equivalent).
 
 ## Design Conventions
 
@@ -123,11 +170,13 @@ Verify with `vsim -version` and `vivado -version` before proceeding.
 
 ## Workflow
 
-```cmd
-cd <project>\sv\scripts
-sim.bat              ← batch simulation
-sim_gui.bat          ← GUI simulation
-viv.bat              ← batch Vivado (synth + sim)
-viv_gui.bat          ← GUI Vivado
+All projects use the cross-platform Python dispatcher.  From any
+project's `sv/` or `vhdl/` directory:
+
+```
+python ../../common/scripts/engine.py sim . top_tb      ← batch simulation
+python ../../common/scripts/engine.py sim . top_tb -g   ← GUI simulation
+python ../../common/scripts/engine.py synth . top       ← batch synthesis
+python ../../common/scripts/engine.py synth . top -g    ← GUI synthesis
 ```
 

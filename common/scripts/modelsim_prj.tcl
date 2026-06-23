@@ -4,8 +4,7 @@
 # Creates a ModelSim project (.mpf) in the project's simdir/prj/,
 # adds the sources, compiles via 'project compileall', and runs.
 #
-# Usage:  run from the project root:
-#   scripts\sim_prj.bat
+# Invoked by engine.py (--prj flag).  See common/scripts/engine.py --help.
 # =====================================================================
 
 # ---- Locate project root --------------------------------------------
@@ -48,8 +47,8 @@ foreach line [read_sources [file join $PROJ_DIR sources.f]] {
 }
 
 # ---- Command-line / env override for top testbench ------------------
-# sim.bat/synth.bat pass SIM_TOP_OVERRIDE to run a different testbench
-# without editing sources.f.  Project mode handles a single top only.
+# engine.py passes SIM_TOP_OVERRIDE to run a different testbench without
+# editing sources.f.  Project mode handles a single top only.
 if {[info exists ::env(SIM_TOP_OVERRIDE)] && $::env(SIM_TOP_OVERRIDE) ne ""} {
     if {$::env(SIM_TOP_OVERRIDE) eq "all"} {
         error "project mode (prj) supports a single testbench only, not 'all'"

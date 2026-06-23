@@ -19,18 +19,18 @@
 # =====================================================================
 #
 # ---- File list ------------------------------------------------------
-design  ../../../../lib/vhdl/stream_pkg.vhd
-design  ../../../../common/hdl/axistream_pkg/payload_pkg.vhd
-design  ../../../../common/hdl/sync_fifo/sync_fifo.vhd
-design  ../../../../common/hdl/stream_fifo/stream_fifo.vhd
-design  ../../../../common/hdl/pixel/pixel_producer.vhd
-design  ../../../../common/hdl/pixel/pixel_consumer.vhd
-design  ../rtl/top.vhd
-sim     ../tb/top_tb.vhd
+design  ../../../lib/vhdl/stream_pkg.vhd
+design  ../../COMMON/axistream_pkg/payload_pkg.vhd
+design  ../../COMMON/sync_fifo/sync_fifo.vhd
+design  ../../COMMON/stream_fifo/stream_fifo.vhd
+design  ../../COMMON/pixel/pixel_producer.vhd
+design  ../../COMMON/pixel/pixel_consumer.vhd
+design  rtl/top.vhd
+sim     tb/top_tb.vhd
 
 # ---- Configuration --------------------------------------------------
 top     top_tb
 name    top
 part    xc7s6cpga196-1
-simdir  ../sim
-vivdir  ../viv
+simdir  sim
+vivdir  viv

@@ -4,8 +4,7 @@
 # Non-project (library-mode) flow: compiles sources directly into the
 # project's simdir, then elaborates and simulates the testbench.
 #
-# Usage:  run from the project root:
-#   scripts\sim.bat
+# Invoked by engine.py.  See common/scripts/engine.py --help.
 # =====================================================================
 
 # ---- Locate project root --------------------------------------------
@@ -46,7 +45,7 @@ foreach line [read_sources [file join $PROJ_DIR sources.f]] {
 }
 
 # ---- Command-line / env override for top testbench ------------------
-# sim.bat can pass SIM_TOP_OVERRIDE to run a different testbench without
+# engine.py passes SIM_TOP_OVERRIDE to run a different testbench without
 # editing sources.f.  If set, it replaces the TOP read from sources.f.
 if {[info exists ::env(SIM_TOP_OVERRIDE)] && $::env(SIM_TOP_OVERRIDE) ne ""} {
     set TOP $::env(SIM_TOP_OVERRIDE)
