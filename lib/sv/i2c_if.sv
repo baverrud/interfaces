@@ -6,16 +6,16 @@
 // access scl/sda via the modport or directly.
 // =====================================================================
 interface i2c_if (
-    inout wire scl,
-    inout wire sda
+  inout wire scl,
+  inout wire sda
 );
-    // No internal logic.  The inout signals pass through to the
-    // master/slave module via the interface instance.
+  // No internal logic.  The inout signals pass through to the
+  // master/slave module via the interface instance.
 
-    modport master (
-        inout scl, sda
-    );
-    modport slave (
-        inout scl, sda
-    );
+  modport master (
+    inout scl, sda
+  );
+  modport slave (
+    inout scl, sda
+  );
 endinterface

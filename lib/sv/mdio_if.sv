@@ -6,16 +6,16 @@
 // MDIO: management data I/O (bidirectional, tri-state)
 // =====================================================================
 interface mdio_if (
-    inout wire mdio
+  inout wire mdio
 );
-    logic mdc;                   // clock (station -> PHY)
+  logic mdc;                   // clock (station -> PHY)
 
-    modport manager (
-        output mdc,
-        inout mdio
-    );
-    modport phy (
-        input  mdc,
-        inout mdio
-    );
+  modport manager (
+    output mdc,
+    inout mdio
+  );
+  modport phy (
+    input  mdc,
+    inout mdio
+  );
 endinterface

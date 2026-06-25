@@ -10,21 +10,21 @@ use ieee.std_logic_1164.all;
 
 package sbi_pkg is
 
-    type sbi_t is record
-        cs    : std_logic;
-        addr  : std_logic_vector;
-        wr    : std_logic;
-        rd    : std_logic;
-        wdata : std_logic_vector;
-        rdata : std_logic_vector;
-        ready : std_logic;
-    end record;
+  type sbi_t is record
+    cs    : std_logic;
+    addr  : std_logic_vector;
+    wr    : std_logic;
+    rd    : std_logic;
+    wdata : std_logic_vector;
+    rdata : std_logic_vector;
+    ready : std_logic;
+  end record;
 
-    view initiator of sbi_t is
-        cs, addr, wr, rd, wdata : out;
-        rdata, ready : in;
-    end view;
+  view initiator of sbi_t is
+    cs, addr, wr, rd, wdata : out;
+    rdata, ready : in;
+  end view;
 
-    alias target is initiator'converse;
+  alias target is initiator'converse;
 
 end package;

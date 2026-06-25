@@ -6,19 +6,19 @@
 //   CS_COUNT = 1 — number of chip-select lines
 // =====================================================================
 interface spi_if #(
-    parameter int CS_COUNT = 1
+  parameter int CS_COUNT = 1
 );
-    logic                sclk;          // clock (master -> slave)
-    logic                mosi;          // master-out, slave-in
-    logic                miso;          // master-in,  slave-out
-    logic [CS_COUNT-1:0] cs;            // chip-select (active low)
+  logic                sclk;          // clock (master -> slave)
+  logic                mosi;          // master-out, slave-in
+  logic                miso;          // master-in,  slave-out
+  logic [CS_COUNT-1:0] cs;            // chip-select (active low)
 
-    modport master (
-        output sclk, mosi, cs,
-        input  miso
-    );
-    modport slave (
-        input  sclk, mosi, cs,
-        output miso
-    );
+  modport master (
+    output sclk, mosi, cs,
+    input  miso
+  );
+  modport slave (
+    input  sclk, mosi, cs,
+    output miso
+  );
 endinterface

@@ -7,18 +7,18 @@
 // =====================================================================
 package stream_pkg;
 
-    // 25-bit RGB pixel with start-of-frame flag  ($bits(pixel_t) == 25)
-    typedef struct packed {
-        logic [7:0] r;
-        logic [7:0] g;
-        logic [7:0] b;
-        logic       sof;
-    } pixel_t;
+  // 25-bit RGB pixel with start-of-frame flag  ($bits(pixel_t) == 25)
+  typedef struct packed {
+    logic [7:0] r;
+    logic [7:0] g;
+    logic [7:0] b;
+    logic       sof;
+  } pixel_t;
 
-    // 32-bit complex (IQ) sample                 ($bits(iq_t) == 32)
-    typedef struct packed {
-        logic signed [15:0] i;
-        logic signed [15:0] q;
-    } iq_t;
+  // 32-bit complex (IQ) sample                 ($bits(iq_t) == 32)
+  typedef struct packed {
+    logic signed [15:0] i;
+    logic signed [15:0] q;
+  } iq_t;
 
 endpackage

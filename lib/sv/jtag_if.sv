@@ -6,16 +6,16 @@
 //   HAS_TRST = 0 — include TRST (test reset) signal
 // =====================================================================
 interface jtag_if #(
-    parameter bit HAS_TRST = 0
+  parameter bit HAS_TRST = 0
 );
-    logic tck;                   // test clock
-    logic tms;                   // test mode select
-    logic tdi;                   // test data in
-    logic tdo;                   // test data out
-    logic trst;                  // test reset (optional, active low)
+  logic tck;                   // test clock
+  logic tms;                   // test mode select
+  logic tdi;                   // test data in
+  logic tdo;                   // test data out
+  logic trst;                  // test reset (optional, active low)
 
-    modport tap (
-        input  tck, tms, tdi, trst,
-        output tdo
-    );
+  modport tap (
+    input  tck, tms, tdi, trst,
+    output tdo
+  );
 endinterface

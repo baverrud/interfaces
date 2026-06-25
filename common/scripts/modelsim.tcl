@@ -76,8 +76,8 @@ proc compile_file {f} {
     switch -- [file extension $f] {
         .sv     { vlog -sv $f }
         .v      { vlog $f }
-        .vhd    { vcom $f }
-        .vhdl   { vcom $f }
+        .vhd    { vcom -2019 $f }
+        .vhdl   { vcom -2019 $f }
         default { error "Unknown file extension on $f" }
     }
 }
@@ -97,6 +97,7 @@ proc run_one {lib top gui} {
     puts "INFO: ===== simulating $top ====="
     vsim -voptargs=+acc -onfinish stop $lib.$top
     if {$gui} { add wave -r /* }
+    onbreak { resume }
     run -all
 }
 

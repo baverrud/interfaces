@@ -10,17 +10,17 @@ use ieee.std_logic_1164.all;
 
 package i2c_pkg is
 
-    type i2c_t is record
-        scl  : std_logic;   -- bidirectional (open-drain)
-        sda  : std_logic;   -- bidirectional (open-drain)
-    end record;
+  type i2c_t is record
+    scl  : std_logic;   -- bidirectional (open-drain)
+    sda  : std_logic;   -- bidirectional (open-drain)
+  end record;
 
-    view master of i2c_t is
-        scl, sda : inout;
-    end view;
+  view master of i2c_t is
+    scl, sda : inout;
+  end view;
 
-    view slave of i2c_t is
-        scl, sda : inout;
-    end view;
+  view slave of i2c_t is
+    scl, sda : inout;
+  end view;
 
 end package;

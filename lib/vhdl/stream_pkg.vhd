@@ -18,32 +18,32 @@ use ieee.std_logic_1164.all;
 
 package stream_pkg is
 
-    type axis_t is record
-        tdata  : std_logic_vector;   -- payload
-        tlast  : std_logic;          -- end-of-packet (always 1 bit)
-        tuser  : std_logic_vector;   -- 1-bit stub when unused
-        tid    : std_logic_vector;
-        tdest  : std_logic_vector;
-        tkeep  : std_logic_vector;
-        tstrb  : std_logic_vector;
-        tvalid : std_logic;
-        tready : std_logic;
-    end record;
+  type axis_t is record
+    tdata  : std_logic_vector;   -- payload
+    tlast  : std_logic;          -- end-of-packet (always 1 bit)
+    tuser  : std_logic_vector;   -- 1-bit stub when unused
+    tid    : std_logic_vector;
+    tdest  : std_logic_vector;
+    tkeep  : std_logic_vector;
+    tstrb  : std_logic_vector;
+    tvalid : std_logic;
+    tready : std_logic;
+  end record;
 
-    -- master (Tx): drives payload + framing, samples back-pressure.
-    view master of axis_t is
-        tdata  : out;
-        tlast  : out;
-        tuser  : out;
-        tid    : out;
-        tdest  : out;
-        tkeep  : out;
-        tstrb  : out;
-        tvalid : out;
-        tready : in;
-    end view;
+  -- master (Tx): drives payload + framing, samples back-pressure.
+  view master of axis_t is
+    tdata  : out;
+    tlast  : out;
+    tuser  : out;
+    tid    : out;
+    tdest  : out;
+    tkeep  : out;
+    tstrb  : out;
+    tvalid : out;
+    tready : in;
+  end view;
 
-    -- slave (Rx): converse of master.
-    alias slave is master'converse;
+  -- slave (Rx): converse of master.
+  alias slave is master'converse;
 
 end package;

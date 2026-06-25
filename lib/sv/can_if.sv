@@ -7,15 +7,15 @@
 // The transceiver handles the physical CAN_H/CAN_L differential pair.
 // =====================================================================
 interface can_if;
-    logic tx;                    // transmit (controller -> transceiver)
-    logic rx;                    // receive  (transceiver -> controller)
+  logic tx;                    // transmit (controller -> transceiver)
+  logic rx;                    // receive  (transceiver -> controller)
 
-    modport controller (
-        output tx,
-        input  rx
-    );
-    modport transceiver (
-        input  tx,
-        output rx
-    );
+  modport controller (
+    output tx,
+    input  rx
+  );
+  modport transceiver (
+    input  tx,
+    output rx
+  );
 endinterface

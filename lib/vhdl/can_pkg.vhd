@@ -6,16 +6,16 @@ use ieee.std_logic_1164.all;
 
 package can_pkg is
 
-    type can_t is record
-        tx : std_logic;
-        rx : std_logic;
-    end record;
+  type can_t is record
+    tx : std_logic;
+    rx : std_logic;
+  end record;
 
-    view controller of can_t is
-        tx : out;
-        rx : in;
-    end view;
+  view controller of can_t is
+    tx : out;
+    rx : in;
+  end view;
 
-    alias transceiver is controller'converse;
+  alias transceiver is controller'converse;
 
 end package;
