@@ -13,7 +13,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use std.env.all;
-use work.stream_pkg.all;
+use work.axis_pkg.all;
 use work.payload_pkg.all;
 
 entity top_tb is

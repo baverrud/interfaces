@@ -1,5 +1,5 @@
 -- =====================================================================
--- stream_pkg.vhd - AXI-Stream record + VHDL-2019 mode views
+-- axis_pkg.vhd - AXI-Stream record + VHDL-2019 mode views
 -- =====================================================================
 -- All sideband signals (except tlast) are unconstrained std_logic_vector.
 -- 1-bit safe-width stubs when unused — NEVER null ranges (crash Vivado GUI).
@@ -16,7 +16,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-package stream_pkg is
+package axis_pkg is
 
   type axis_t is record
     tdata  : std_logic_vector;   -- payload

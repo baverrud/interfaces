@@ -6,7 +6,7 @@
 -- =====================================================================
 library ieee;
 use ieee.std_logic_1164.all;
-use work.stream_pkg.all;
+use work.axis_pkg.all;
 
 entity stream_fifo is
   generic (

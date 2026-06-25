@@ -1,60 +1,42 @@
 `timescale 1ns/1ps
 // =====================================================================
-// top.sv - AXI4-Lite demo: test driver -> axil_reg
+// top.sv - AXI4-Lite demo top level (full master + full slave)
 // =====================================================================
-// The test driver writes a value to the register, then reads it back.
+// Instantiates the bus interface, the AXI4-Lite master test sequencer,
+// and the AXI4-Lite register-file slave.  Clock and reset flow through
+// the interface to both sub-modules.
+//
+// Interface demo: a single `axilite_if` bus instance carries all 5 AXI
+// channels.  The master drives the `bus.master` modport and the slave
+// responds on `bus.slave`.  See top_sub.sv for channel-split usage.
 // =====================================================================
 module top #(
   parameter int DATA_W = 32,
-  parameter int ADDR_W = 32
+  parameter int ADDR_W = 32,
+  parameter int USER_W = 0,
+  parameter int DEPTH  = 256
 ) (
-  input  logic        aclk,
-  input  logic        aresetn,
-  output logic [DATA_W-1:0] reg_readout
+  input  logic                aclk,
+  input  logic                aresetn,
+  output logic [DATA_W-1:0]   rd_data,    // read data from current beat
+  output logic                rd_valid,   // strobe: rd_data captured
+  output logic                done
 );
-  axilite_if #(.DATA_W(DATA_W), .ADDR_W(ADDR_W)) bus (.aclk, .aresetn);
+  // One interface instance carries all AXI4-Lite signals between master and slave
+  axilite_if #(.DATA_W(DATA_W), .ADDR_W(ADDR_W), .USER_W(USER_W)) bus (.aclk, .aresetn);
 
-  // Simple test sequencer (write one value, then read it back)
-  logic [DATA_W-1:0] test_val = DATA_W'(32'hDEADBEEF);
-  logic [1:0] state = 2'd0;
+  // AXI4-Lite master -- test sequencer FSM
+  // Drives the write+read sequence on the bus.master modport.
+  axilite_master #(.DATA_W(DATA_W), .ADDR_W(ADDR_W), .USER_W(USER_W))
+    u_master (
+      .m         (bus.master),
+      .rd_data,
+      .rd_valid,
+      .done
+    );
 
-  always_ff @(posedge aclk or negedge aresetn) begin
-    if (!aresetn) begin
-      state <= 2'd0;
-    end else begin
-      case (state)
-        2'd0: begin                          // Write phase
-          if (bus.awvalid && bus.awready)   state <= 2'd1;
-          if (!bus.awvalid)                 bus.awvalid <= 1'b1;
-        end
-        2'd1: begin
-          bus.wstrb  <= '1;
-          bus.wdata  <= test_val;
-          if (!bus.wvalid)                  bus.wvalid <= 1'b1;
-          if (bus.wvalid && bus.wready)     state <= 2'd2;
-        end
-        2'd2: begin
-          if (bus.bvalid && bus.bready)     state <= 2'd3;
-          if (!bus.bready)                  bus.bready <= 1'b1;
-        end
-        2'd3: begin                          // Read phase
-          if (!bus.arvalid)                 bus.arvalid <= 1'b1;
-          if (bus.arvalid && bus.arready)   state <= 2'd4;
-        end
-        2'd4: begin
-          if (bus.rvalid && bus.rready)     state <= 2'd5;
-          if (!bus.rready)                  bus.rready <= 1'b1;
-        end
-        2'd5: ;  // done
-      endcase
-    end
-  end
-
-  // Defaults
-  assign bus.awaddr = '0;
-  assign bus.awprot = '0;
-
-  assign reg_readout = bus.rdata;
-
-  axil_reg #(.DATA_W(DATA_W), .ADDR_W(ADDR_W)) u_reg (.s(bus.slave));
+  // AXI4-Lite slave -- register-file memory
+  // Responds to transactions from the master on the bus.slave modport.
+  axilite_slave #(.DATA_W(DATA_W), .ADDR_W(ADDR_W), .USER_W(USER_W), .DEPTH(DEPTH))
+    u_slave (.s(bus.slave));
 endmodule

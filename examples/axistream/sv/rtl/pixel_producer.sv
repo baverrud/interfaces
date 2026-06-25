@@ -11,7 +11,7 @@ module pixel_producer #(
 ) (
   axis_if.master m              // m.tdata is pixel_t (from the instance)
 );
-  import stream_pkg::*;
+  import payload_pkg::*;
 
   logic [7:0] cnt  = '0;        // pixel index in line
   logic [7:0] seed = '0;        // evolving colour

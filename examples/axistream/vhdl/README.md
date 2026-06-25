@@ -1,44 +1,55 @@
-# AXI-Stream Interface Project (VHDL)
+# AXI4-Stream Interface Project (VHDL)
 
-VHDL-2019 counterpart of the SV AXI-Stream demonstration.
+VHDL-2019 counterpart of the SV AXI4-Stream demonstration.
 
 ## Design
 
 | File | Description |
 |------|-------------|
-| `../../../lib/vhdl/stream_pkg.vhd` | Mode-view AXI-Stream record (`axis_t` with tx/rx views) |
-| `../../COMMON/axistream_pkg/payload_pkg.vhd` | Structured payload types + `to_slv`/`from_slv` pack/unpack |
+| `../../../lib/vhdl/axis_pkg.vhd` | Mode-view AXI-Stream record (`axis_t` with tx/rx views) |
+| `rtl/payload_pkg.vhd` | Structured payload types + `to_slv`/`from_slv` pack/unpack |
 | `../../COMMON/sync_fifo/sync_fifo.vhd` | Generic-width FWFT synchronous FIFO |
 | `../../COMMON/stream_fifo/stream_fifo.vhd` | AXI-Stream wrapper around `sync_fifo` |
-| `../../COMMON/pixel/pixel_producer.vhd` | RGB pixel stream source |
-| `../../COMMON/pixel/pixel_consumer.vhd` | RGB pixel stream sink |
+| `rtl/pixel_producer.vhd` | RGB pixel stream source |
+| `rtl/pixel_consumer.vhd` | RGB pixel stream sink |
 | `rtl/top.vhd` | Synthesizable top: producer → stream_fifo → consumer |
 | `tb/top_tb.vhd` | Self-checking testbench |
 
-## Scripts
+## Prerequisites
 
-From the `vhdl/` directory:
+Before running any scripts, ensure the required EDA tools are
+available on your `PATH`:
 
-| Command | Description |
-|---------|-------------|
-| `sim top_tb` | Batch simulate, ModelSim |
-| `sim all` | Batch simulate all testbenches |
-| `sim top_tb -b xsim` | Batch simulate, Vivado xsim |
-| `sim top_tb -g` | ModelSim GUI (library mode) |
-| `sim top_tb -p` | ModelSim GUI (project mode) |
-| `synth top` | Batch synthesize, Vivado |
-| `synth all` | Batch synthesize all tops |
-| `synth top -g` | Vivado GUI synthesis |
+- **Questa / ModelSim** — `vsim`, `vcom`, `vlog` must be in `PATH`
+- **Vivado** — `vivado` must be in `PATH` (for xsim or synthesis)
 
-Or from anywhere, using the Python dispatcher directly:
+VHDL-2019 features require a recent Questa (2025+) or Vivado (2026+).
 
-| Command | Description |
-|---------|-------------|
-| `python common/scripts/engine.py sim vhdl top_tb` | Batch simulate, ModelSim |
-| `python common/scripts/engine.py sim vhdl all` | Batch simulate all testbenches |
-| `python common/scripts/engine.py sim vhdl top_tb -b xsim` | Batch simulate, Vivado xsim |
-| `python common/scripts/engine.py sim vhdl top_tb -g` | ModelSim GUI |
-| `python common/scripts/engine.py sim vhdl top_tb -p` | ModelSim project mode |
-| `python common/scripts/engine.py synth vhdl top` | Batch synthesize, Vivado |
-| `python common/scripts/engine.py synth vhdl all` | Batch synthesize all tops |
-| `python common/scripts/engine.py synth vhdl top -g` | Vivado GUI synthesis |
+## How to Run
+
+### Using the convenience wrappers (Windows)
+
+```powershell
+cd examples/axistream/vhdl
+.\sim.bat top_tb
+.\sim.bat top_tb -b xsim
+.\synth.bat top
+```
+
+### Using the Python dispatcher (cross-platform)
+
+```powershell
+cd examples/axistream/vhdl
+python ../../common/scripts/engine.py sim . top_tb
+python ../../common/scripts/engine.py sim . top_tb -b xsim
+python ../../common/scripts/engine.py synth . top
+```
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `-b modelsim` | Simulate with ModelSim/Questa (default) |
+| `-b xsim` | Simulate with Vivado xsim |
+| `-g`, `--gui` | Launch the tool GUI (single target only) |
+| `-p`, `--prj` | ModelSim project-mode GUI (implies `--gui`) |

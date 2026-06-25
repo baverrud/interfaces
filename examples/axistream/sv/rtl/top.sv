@@ -18,7 +18,7 @@ module top #(
   output logic        last_sof,
   output logic [15:0] beats
 );
-  import stream_pkg::*;
+  import payload_pkg::*;
 
   axis_if #(.PAYLOAD_T(pixel_t), .HAS_TLAST(1)) src  (.aclk, .aresetn);
   axis_if #(.PAYLOAD_T(pixel_t), .HAS_TLAST(1)) sink (.aclk, .aresetn);

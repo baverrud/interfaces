@@ -1,34 +1,21 @@
 # =====================================================================
-# sources.f - source manifest and project configuration
+# sources.f - AXI4-Stream VHDL project source manifest
 # =====================================================================
-# Format:  <keyword>  <value>
-#
-# File list (ORDER MATTERS: dependencies first):
-#   design  <path>   synthesis + simulation source
-#   sim     <path>   simulation-only (testbench)
-#
-# Configuration:
-#   top     <module> top-level simulation module
-#   name    <name>   project name (ModelSim .mpf / Vivado project)
-#   part    <part>   FPGA part number (Vivado)
-#   simdir  <dir>    simulation output dir (relative to this file)
-#   vivdir  <dir>    Vivado output dir (relative to this file)
-#
-# Paths are relative to this file's directory.
-# Blank lines and lines starting with '#' are ignored.
-# =====================================================================
-#
-# ---- File list ------------------------------------------------------
-design  ../../../lib/vhdl/stream_pkg.vhd
-design  ../../COMMON/axistream_pkg/payload_pkg.vhd
-design  ../../COMMON/sync_fifo/sync_fifo.vhd
-design  ../../COMMON/stream_fifo/stream_fifo.vhd
-design  ../../COMMON/pixel/pixel_producer.vhd
-design  ../../COMMON/pixel/pixel_consumer.vhd
-design  rtl/top.vhd
-sim     tb/top_tb.vhd
+design  ../../../lib/vhdl/axis_pkg.vhd           # shared AXI4-Stream package (axis_t + mode views)
+design  rtl/payload_pkg.vhd                     # structured payload types + pack/unpack
+design  ../../COMMON/sync_fifo/sync_fifo.vhd      # generic-width FWFT synchronous FIFO
+design  ../../COMMON/stream_fifo/stream_fifo.vhd  # AXI-Stream wrapper around sync_fifo
+design  rtl/pixel_producer.vhd                     # RGB pixel stream source
+design  rtl/pixel_consumer.vhd                     # RGB pixel stream sink
+design  rtl/top.vhd                               # top: producer -> stream_fifo -> consumer
+sim     tb/top_tb.vhd                             # self-checking TB (pack/unpack, IQ, pixel)
 
 # ---- Configuration --------------------------------------------------
+top     top_tb
+name    top
+part    xc7s6cpga196-1
+simdir  sim
+vivdir  viv
 top     top_tb
 name    top
 part    xc7s6cpga196-1

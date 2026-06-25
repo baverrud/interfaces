@@ -7,7 +7,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use work.stream_pkg.all;
+use work.axis_pkg.all;
 use work.payload_pkg.all;
 
 entity pixel_producer is
@@ -35,7 +35,7 @@ begin
   m.tdata  <= pixel_to_slv(px);
   m.tvalid <= '1';
   m.tlast  <= '1' when cnt = LINE - 1 else '0';
-  -- 1-bit sideband stubs — tie low (synthesis constant-propagates to zero)
+  -- 1-bit sideband stubs -- tie low (synthesis constant-propagates to zero)
   m.tuser  <= (m.tuser'range => '0');
   m.tid    <= (m.tid'range => '0');
   m.tdest  <= (m.tdest'range => '0');

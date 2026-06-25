@@ -137,18 +137,13 @@ sidebands — adding them is left as an exercise for the reader.
 
 ## Prerequisites
 
-Before running any scripts, source the EDA tool environment:
+Before running any scripts, ensure the required EDA tools are
+available on your `PATH`:
 
-```powershell
-# Questa / ModelSim
-c:\cmdtools\q26.bat
+- **Questa / ModelSim** — `vsim`, `vcom`, `vlog` must be in `PATH`
+- **Vivado** — `vivado` must be in `PATH` (for xsim or synthesis)
 
-# Vivado (for xsim or synthesis)
-c:\cmdtools\v26.bat
-```
-
-See `c:\cmdtools\instructions.md` for tool selection rules (VHDL-2019
-requires `q26.bat` / `v26.bat`).
+VHDL-2019 features require a recent Questa (2025+) or Vivado (2026+).
 
 ## How to Run
 

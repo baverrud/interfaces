@@ -8,7 +8,7 @@ FPGA interface definitions using SystemVerilog (`_if.sv`) and VHDL-2019
 
 | Protocol | SV | VHDL |
 |---|---|---|
-| **AXI4-Stream** | `lib/sv/axis_if.sv` | `lib/vhdl/stream_pkg.vhd` |
+| **AXI4-Stream** | `lib/sv/axis_if.sv` | `lib/vhdl/axis_pkg.vhd` |
 | **AXI4** | `lib/sv/axi4_if.sv` | `lib/vhdl/axi4_pkg.vhd` |
 | **AXI3** | `lib/sv/axi3_if.sv` | `lib/vhdl/axi3_pkg.vhd` |
 | **AXI4-Lite** | `lib/sv/axilite_if.sv` | `lib/vhdl/axilite_pkg.vhd` |
@@ -37,11 +37,11 @@ interfaces/
 │   ├── scripts/          ← shared engine.py + Tcl
 │   └── wrappers/         ← Zynq PS wrapper reference
 └── examples/             ← demo projects
-    ├── COMMON/           ← helper module library (was common/hdl)
+    ├── COMMON/           ← shared helper modules (sync_fifo, stream_fifo, axil_reg)
     ├── axi4/             ← burst write/read master + slave
     ├── axistream/        ← pixel pipeline (SV + VHDL)
     ├── axilite/          ← register access demo
-    ├── axi3/             ← interface only (no demo yet)
+    ├── axi3/             ← full AXI3 examples (SV + VHDL)
     ├── apb/ ...          ← interface only
 ```
 

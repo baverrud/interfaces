@@ -10,7 +10,7 @@
 // =====================================================================
 `timescale 1ns/1ps
 module top_tb;
-  import stream_pkg::*;
+  import payload_pkg::*;
 
   localparam time TCLK = 10ns;
   localparam int  NIQ  = 8;

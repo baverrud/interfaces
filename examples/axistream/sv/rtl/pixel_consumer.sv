@@ -14,7 +14,7 @@ module pixel_consumer (
   output logic        last_sof,
   output logic [15:0] beats
 );
-  import stream_pkg::*;
+  import payload_pkg::*;
 
   pixel_t      px;
   logic [15:0] nbeat = '0;
