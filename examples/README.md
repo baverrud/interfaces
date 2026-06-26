@@ -29,5 +29,3 @@ Demonstration designs for each protocol, organized by language variant.
 | `sync_fifo` | `COMMON/sync_fifo/` | Generic-width FWFT synchronous FIFO |
 | `stream_fifo` | `COMMON/stream_fifo/` | AXI-Stream wrapper around sync_fifo |
 | `axil_reg` | `COMMON/axil_reg/` | AXI4-Lite register file (decoupled) |
-| `pixel` | `COMMON/pixel/` | Pixel producer/consumer for AXI4-Stream demo |
-| `axistream_pkg` | `COMMON/axistream_pkg/` | AXI4-Stream payload type definitions |

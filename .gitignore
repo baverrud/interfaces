@@ -27,6 +27,16 @@ dfx_runtime.txt
 # VS Code agent instructions (machine-local paths — not part of the repo)
 /.instructions.md
 
+# VS Code local settings
+.vscode/
+
+# Questa/ModelSim compiled libraries
+work/
+
+# Python cache
+__pycache__/
+*.pyc
+
 # Windows
 Thumbs.db
 desktop.ini

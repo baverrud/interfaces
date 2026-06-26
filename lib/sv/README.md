@@ -20,7 +20,4 @@ carry clock/reset (`aclk`, `aresetn`) as interface ports.
 | `uart_if.sv` | UART | `master`, `slave` |
 | `can_if.sv` | CAN | `controller`, `transceiver` |
 | `mdio_if.sv` | MDIO | `manager`, `phy` |
-| `jtag_if.sv` | JTAG | `tap` |
-| `can_if.sv` | CAN | `master`, `slave` |
-| `mdio_if.sv` | MDIO | `master`, `slave` |
 | `jtag_if.sv` | JTAG | `controller`, `tap` |
