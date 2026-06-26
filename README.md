@@ -26,6 +26,10 @@ FPGA interface definitions using SystemVerilog (`_if.sv`) and VHDL-2019
 
 Full AXI signal reference: [`common/wrappers/README.md`](common/wrappers/README.md)
 
+Comprehensive language guides:
+- [`VHDL2019_GUIDE.md`](VHDL2019_GUIDE.md) — mode views, record constraints, `'converse`, common pitfalls
+- [`SYSTEMVERILOG_GUIDE.md`](SYSTEMVERILOG_GUIDE.md) — modports, parameterised interfaces, interface arrays
+
 ## Naming Conventions
 
 Interface roles use protocol-appropriate terminology rather than a
