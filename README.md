@@ -26,6 +26,23 @@ FPGA interface definitions using SystemVerilog (`_if.sv`) and VHDL-2019
 
 Full AXI signal reference: [`common/wrappers/README.md`](common/wrappers/README.md)
 
+## Naming Conventions
+
+Interface roles use protocol-appropriate terminology rather than a
+one-size-fits-all `master`/`slave`:
+
+| Convention | Protocols | Rationale |
+|------------|-----------|-----------|
+| `master` / `slave` | AXI3/4/4L, AXI4-Stream, APB, Wishbone, SPI, QSPI, I2C, UART | Industry-standard AMBA / SPI / I2C terminology |
+| `controller` / `transceiver` | CAN | Per ISO 11898 — controller handles protocol, transceiver drives physical bus |
+| `controller` / `peripheral` | I2S | Clock master is the CODEC (peripheral), not the CPU (controller) |
+| `controller` / `tap` | JTAG | Per IEEE 1149.1 — controller drives TCK/TMS/TDI, TAP is the target device |
+| `manager` / `phy` | MDIO | Per IEEE 802.3 — station management (manager) talks to the PHY |
+| `initiator` / `target` | SBI | Lightweight register bus without bus-master hierarchy |
+
+Example modules use matching names (e.g., `i2s_controller` / `i2s_peripheral`,
+`can_controller` / `can_transceiver`, `jtag_controller` / `jtag_tap`).
+
 ## Repository Structure
 
 ```
