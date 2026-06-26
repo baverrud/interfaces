@@ -46,4 +46,33 @@ package axis_pkg is
   -- slave (Rx): converse of master.
   alias slave is master'converse;
 
+  -- ===================================================================
+  -- Option A: Fully constrained 32-bit record (no per-signal constraints)
+  -- ===================================================================
+  -- All vector widths are fixed in the type — signal declarations need
+  -- NO record constraint syntax.  Trade-off: one type per width combo.
+  -- ===================================================================
+  type axis_32b_t is record
+    tdata  : std_logic_vector(31 downto 0);  -- 32-bit payload
+    tlast  : std_logic;                       -- end-of-packet
+    tuser  : std_logic_vector(0 downto 0);   -- 1-bit stub
+    tid    : std_logic_vector(0 downto 0);
+    tdest  : std_logic_vector(0 downto 0);
+    tkeep  : std_logic_vector(0 downto 0);
+    tstrb  : std_logic_vector(0 downto 0);
+    tvalid : std_logic;
+    tready : std_logic;
+  end record;
+
+  view master_32b of axis_32b_t is
+    tdata, tlast, tuser, tid, tdest, tkeep, tstrb, tvalid : out;
+    tready : in;
+  end view;
+  alias slave_32b is master_32b'converse;
+
+  -- ===================================================================
+  -- Option B: Array of streams (N independent channels in one bundle)
+  -- ===================================================================
+  type axis_array_t is array (natural range <>) of axis_t;
+
 end package;

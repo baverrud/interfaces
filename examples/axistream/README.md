@@ -18,6 +18,8 @@ tx/rx modports and the `payload_pkg` package (`sv/rtl/`).
 | Design | RTL | TB | Description |
 |--------|-----|----|-------------|
 | `top` | `rtl/top.sv` | `tb/top_tb.sv` | **Pixel pipeline** — `pixel_producer` drives the `master` modport, `pixel_consumer` responds on the `slave` modport, with a `stream_fifo` between them. Tests pack/unpack round-trips and IQ stream through a generic FIFO. |
+| `top_concrete` | `rtl/top_concrete.sv` | `tb/top_concrete_tb.sv` | **Concrete 32-bit interface** — uses `axis_32b_if` (no `#()` parameters) with all widths fixed. Self-contained inline producer/consumer. Compare with `top_constrained` VHDL variant. |
+| `top_array` | `rtl/top_array.sv` | `tb/top_array_tb.sv` | **N parallel pixel lanes** — demonstrates SV interface arrays (`axis_if buses[N]`). A `generate for` loop instantiates identical producer → FIFO → consumer lanes. |
 
 ### VHDL (`vhdl/`)
 
@@ -26,7 +28,10 @@ with VHDL-2019 mode views.  Clock and reset are separate entity ports.
 
 | Design | RTL | TB | Description |
 |--------|-----|----|-------------|
-| `top` | `rtl/top.vhd` | `tb/top_tb.vhd` | **Pixel pipeline** — same structure as the SV version: producer → stream_fifo → consumer. Demonstrates the `axis_t` record with `master`/`slave` views. |
+| `top` | `rtl/top.vhd` | `tb/top_tb.vhd` | **Pixel pipeline** — same structure as the SV version: producer → stream_fifo → consumer. Demonstrates the `axis_t` record with `master`/`slave` views and inline per-signal record constraints. |
+| `top_subtype` | `rtl/top_subtype.vhd` | `tb/top_subtype_tb.vhd` | **Subtype-based pixel pipeline** — functionally identical to `top`, but signal declarations use the `pixel_stream_t` subtype from `payload_pkg` instead of inline constraints. Compare the two architectures to see the boilerplate reduction. |
+| `top_constrained` | `rtl/top_constrained.vhd` | `tb/top_constrained_tb.vhd` | **Fully constrained 32-bit record** — uses `axis_32b_t` where all vector widths are fixed in `axis_pkg.vhd`. Signal declarations need no constraint syntax at all. Self-contained (producer/consumer inline) to focus on the type. |
+| `top_array` | `rtl/top_array.vhd` | `tb/top_array_tb.vhd` | **N parallel pixel lanes** — demonstrates `axis_array_t`, an array of `axis_t` signals. A `for ... generate` loop instantiates identical producer → FIFO → consumer lanes. Each array element IS an `axis_t`, so existing entities connect directly. |
 
 ### Block Diagram
 
@@ -38,6 +43,121 @@ top / top_tb (SV + VHDL):
   │  pixel_consumer  ── rx ─┘   fifo     │
   └──────────────────────────────────────┘
 ```
+
+### Interface Patterns (VHDL-2019)
+
+Compare four styles for declaring AXI-Stream signals, from most verbose to most concise:
+
+| # | Style | Signal Declaration | Defined In | File |
+|---|-------|-------------------|------------|------|
+| 1 | **Inline constraints** | `signal s : axis_t(tdata(N-1 downto 0), tuser(0 downto 0), ...)` | Per signal | `top.vhd` |
+| 2 | **Subtype alias** | `signal s : pixel_stream_t;` | `payload_pkg.vhd` | `top_subtype.vhd` |
+| 3 | **Fully constrained record** | `signal s : axis_32b_t;` | `axis_pkg.vhd` | `top_constrained.vhd` |
+| 4 | **Array of streams** | `signal s : axis_array_t(0 to N-1)(tdata(...), ...)` | `axis_pkg.vhd` | `top_array.vhd` |
+
+**Style 1 — Inline constraints** (`top.vhd`): each signal spells out every
+sideband.  Verbose but explicit — all widths visible at the point of use.
+
+```vhdl
+signal src  : axis_t(
+    tdata(PIXEL_W - 1 downto 0),
+    tuser(0 downto 0), tid(0 downto 0), tdest(0 downto 0),
+    tkeep(0 downto 0), tstrb(0 downto 0)
+);
+```
+
+**Style 2 — Subtype alias** (`top_subtype.vhd`): the constraint is factored
+into a reusable subtype in `payload_pkg.vhd`.  The subtype lives next to the
+payload type, so updating sidebands changes one place, not every signal.
+
+```vhdl
+subtype pixel_stream_t is axis_t(
+    tdata(PIXEL_W - 1 downto 0),
+    tuser(0 downto 0), tid(0 downto 0), tdest(0 downto 0),
+    tkeep(0 downto 0), tstrb(0 downto 0)
+);
+signal src : pixel_stream_t;   -- one word per signal
+```
+
+**Style 3 — Fully constrained record** (`top_constrained.vhd`): all vector
+widths are fixed in the type itself.  Signal declarations need **zero**
+constraint syntax, but you need a separate type for every width combination.
+
+```vhdl
+type axis_32b_t is record
+    tdata  : std_logic_vector(31 downto 0);  -- fixed
+    tuser  : std_logic_vector(0 downto 0);
+    ...
+end record;
+signal bus : axis_32b_t;   -- no constraint at all
+```
+
+**Style 4 — Array of streams** (`top_array.vhd`): N independent AXI-Stream
+channels in one bundle.  Each element IS an `axis_t`, so existing entities
+connect directly.  A `for ... generate` loop instantiates per-lane logic.
+
+```vhdl
+type axis_array_t is array (natural range <>) of axis_t;
+signal lanes : axis_array_t(0 to N-1)(
+    tdata(PIXEL_W - 1 downto 0),
+    tuser(0 downto 0), ...
+);
+```
+
+All four styles produce the same hardware; the choice is about code
+maintainability and intent communication.
+
+### Interface Patterns (SystemVerilog)
+
+The SV side demonstrates three styles, from most generic to most concrete:
+
+| # | Style | Instantiation | Defined In | File |
+|---|-------|--------------|------------|------|
+| 1 | **Parameterized interface** | `axis_if #(.PAYLOAD_T(pixel_t), .HAS_TLAST(1)) str(...)` | `axis_if.sv` | `top.sv` |
+| 2 | **Concrete interface** | `axis_32b_if str(...)` — no `#()` | `sv/rtl/axis_32b_if.sv` | `top_concrete.sv` |
+| 3 | **Interface array** | `axis_if #(...) buses[N] (...)` | — | `top_array.sv` |
+
+**Style 1 — Parameterized** (`top.sv`): the generic `axis_if` is configured
+with a packed struct type for `tdata`.  One interface definition serves all
+payload widths.
+
+```systemverilog
+axis_if #(.PAYLOAD_T(pixel_t), .HAS_TLAST(1)) src (.aclk, .aresetn);
+```
+
+**Style 2 — Concrete interface** (`top_concrete.sv`): a non-parameterized
+interface with `tdata` fixed to 32 bits and all sidebands at 1-bit safe
+width.  No `#()` needed at instantiation — simpler to read, but one
+interface per width combo.
+
+```systemverilog
+// Separate interface file with all widths fixed:
+axis_32b_if str (.aclk, .aresetn);    // no #() parameters
+```
+
+Producer and consumer logic is inline because the existing `pixel_producer`
+and `stream_fifo` modules expect `axis_if` ports (a different interface
+type).  In a real design you would create matching entity modules.
+
+**Style 3 — Interface array** (`top_array.sv`): N independent AXI-Stream
+channels declared in one line with `buses[N]`.  A `generate for` loop
+instantiates per-lane logic.  Each element IS an `axis_if`, so existing
+modules connect directly.
+
+```systemverilog
+axis_if #(.PAYLOAD_T(pixel_t), .HAS_TLAST(1)) src[N] (.aclk, .aresetn);
+//                                                    ↑ N instances
+
+generate
+  for (genvar i = 0; i < N; i++) begin
+    pixel_producer #(.LINE(LINE)) u_prod (.m(src[i].master));
+    // ...
+  end
+endgenerate
+```
+
+This is the SV equivalent of VHDL's `axis_array_t` — the same `for generate`
+pattern scales to any number of lanes.
 
 ## User Guide
 
@@ -305,7 +425,13 @@ python ../../common/scripts/engine.py synth . top
 | Target | Action | Description |
 |--------|--------|-------------|
 | `top_tb` | sim | Simulate the pixel pipeline testbench |
+| `top_subtype_tb` | sim | Simulate the subtype-based pixel pipeline |
+| `top_constrained_tb` | sim | Simulate the 32-bit constrained record demo |
+| `top_array_tb` | sim | Simulate the array-of-streams demo |
 | `top` | synth | Synthesize the pixel pipeline design |
+| `top_subtype` | synth | Synthesize the subtype-based pixel pipeline |
+| `top_constrained` | synth | Synthesize the constrained 32-bit record demo |
+| `top_array` | synth | Synthesize the array-of-streams design |
 
 ### Options
 
@@ -327,3 +453,6 @@ and project configuration.  Paths are relative to the file's directory.
 |-----------|----------|----------|
 | `top_tb` | SV | pack/unpack OK, IQ FIFO OK, pixel pipeline 62 beats, PASSED |
 | `top_tb` | VHDL | pack/unpack OK, IQ FIFO OK, pixel pipeline 62 beats, PASSED |
+| `top_subtype_tb` | VHDL | Same as `top_tb` — functionally identical pipeline |
+| `top_constrained_tb` | VHDL | 16 beats through `axis_32b_t`, done asserted, PASSED |
+| `top_array_tb` | VHDL | N lanes produce ≥ N×LINE beats, done asserted, PASSED |

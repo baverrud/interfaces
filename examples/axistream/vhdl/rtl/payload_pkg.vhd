@@ -10,6 +10,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.axis_pkg.all;
 
 package payload_pkg is
 
@@ -37,6 +38,18 @@ package payload_pkg is
   -- you add a subfield; keep these in step with the to_slv functions).
   constant PIXEL_W : natural := 8 + 8 + 8 + 1;   -- r + g + b + sof = 25
   constant IQ_W    : natural := 16 + 16;         -- i + q          = 32
+
+  -- Preconstrained stream subtype for pixel_t — all sidebands stubbed to
+  -- 1-bit safe width.  Using this subtype eliminates repetitive inline
+  -- record constraints (see top_subtype.vhd vs. top.vhd).
+  subtype pixel_stream_t is axis_t(
+    tdata(PIXEL_W - 1 downto 0),
+    tuser(0 downto 0),
+    tid(0 downto 0),
+    tdest(0 downto 0),
+    tkeep(0 downto 0),
+    tstrb(0 downto 0)
+  );
 
 end package;
 
