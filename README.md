@@ -38,11 +38,21 @@ interfaces/
 │   └── wrappers/         ← Zynq PS wrapper reference
 └── examples/             ← demo projects
     ├── COMMON/           ← shared helper modules (sync_fifo, stream_fifo, axil_reg)
-    ├── axi4/             ← burst write/read master + slave
-    ├── axistream/        ← pixel pipeline (SV + VHDL)
-    ├── axilite/          ← register access demo
+    ├── apb/              ← register write/read
     ├── axi3/             ← full AXI3 examples (SV + VHDL)
-    ├── apb/ ...          ← interface only
+    ├── axi4/             ← burst write/read master + slave
+    ├── axilite/          ← register access demo
+    ├── axistream/        ← pixel pipeline (SV + VHDL)
+    ├── can/              ← controller/transceiver loopback
+    ├── i2c/              ← open-drain write+read with pull-ups
+    ├── i2s/              ← controller/peripheral audio loopback
+    ├── jtag/             ← IEEE 1149.1 TAP state machine + bypass register
+    ├── mdio/             ← Clause 22 manager/PHY write+read
+    ├── qspi/             ← quad-SPI register write/read
+    ├── sbi/              ← initiator/target register access
+    ├── spi/              ← register write/read
+    ├── uart/             ← tx/rx with start+8+stop framing
+    └── wishbone/         ← master/slave register access
 ```
 
 Each demo project follows a consistent layout:

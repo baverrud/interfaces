@@ -12,12 +12,15 @@ carry clock/reset (`aclk`, `aresetn`) as interface ports.
 | `axilite_if.sv` | AXI4-Lite | `master`, `slave`, sub-channel |
 | `apb_if.sv` | APB | `master`, `slave` |
 | `wishbone_if.sv` | Wishbone | `master`, `slave` |
-| `sbi_if.sv` | SBI | `master`, `slave` |
+| `sbi_if.sv` | SBI | `initiator`, `target` |
 | `spi_if.sv` | SPI | `master`, `slave` |
 | `qspi_if.sv` | QSPI | `master`, `slave` |
-| `i2c_if.sv` | I2C | `manager`, `target` |
-| `i2s_if.sv` | I2S | `controller`, `peripheral` |
+| `i2c_if.sv` | I2C | `master`, `slave` |
+| `i2s_if.sv` | I2S | `master`, `slave` |
 | `uart_if.sv` | UART | `master`, `slave` |
+| `can_if.sv` | CAN | `controller`, `transceiver` |
+| `mdio_if.sv` | MDIO | `manager`, `phy` |
+| `jtag_if.sv` | JTAG | `tap` |
 | `can_if.sv` | CAN | `master`, `slave` |
 | `mdio_if.sv` | MDIO | `master`, `slave` |
 | `jtag_if.sv` | JTAG | `controller`, `tap` |
