@@ -19,4 +19,6 @@ package jtag_pkg is
     tdo : out;
   end view;
 
+  alias controller is tap'converse;
+
 end package;

@@ -21,7 +21,7 @@ entity top is
 end entity;
 
 architecture rtl of top is
-  -- Per-channel AXI4 bus signals with constrained vector widths
+  -- Per-channel AXI4 b signals with constrained vector widths
   signal aw_bus: axi4_aw_t(awid(ID_W-1 downto 0),awaddr(ADDR_W-1 downto 0),awuser(0 downto 0));
   signal w_bus:  axi4_w_t(wdata(DATA_W-1 downto 0),wstrb(DATA_W/8-1 downto 0),wuser(0 downto 0));
   signal b_bus:  axi4_b_t(bid(ID_W-1 downto 0),buser(0 downto 0));
