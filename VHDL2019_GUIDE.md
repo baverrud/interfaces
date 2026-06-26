@@ -9,14 +9,22 @@ and slave roles.
 
 ## 1. VHDL-2019 Tool Support
 
-| Tool | Min. version | Notes |
-|------|-------------|-------|
-| **Questa** | 2025.3 (`q26.bat`) | Full VHDL-2019 support |
-| **Vivado** | 2026.1 (`v26.bat`) | Full VHDL-2019 support |
-| **ModelSim** | 2020.1 (`m20.bat`) | VHDL-2008 only (cannot compile packages, but can *simulate* pre-compiled designs) |
+The features used in this repository — **mode views**, **`'converse`**,
+and **record constraints** — are supported by the following tools:
 
-The convenience wrappers `q26.bat` (Questa 2025.3) and `v26.bat`
-(Vivado 2026.1) are available at `c:\cmdtools`.
+| Tool | Min. version | Feature support |
+|------|-------------|-----------------|
+| **Questa** | 2025.3 | Mode views ✅ `'converse` ✅ Record constraints ✅ `inout` in views ✅ Concurrent assigns on view ports ✅ |
+| **Vivado** | 2026.1 | Mode views ✅ `'converse` ✅ Record constraints ✅ `inout` in views ✅ Concurrent assigns on view ports ✅ |
+| **ModelSim** | 2020.1 | VHDL-2008 only — cannot compile mode views, but can *simulate* designs pre-compiled with Questa |
+
+Not all VHDL-2019 features are implemented in every tool (e.g., `ref`
+mode in views, the `private` view aspect, or the new sequential
+`case/end case` and `if/end if` constructs may differ).  The subset
+used here has been verified on Questa 2025.3 and Vivado 2026.1.
+
+The batch scripts (`sim.bat`) automatically pass the `-2019` flag to
+the compiler when processing VHDL files.
 
 ---
 
