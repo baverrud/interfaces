@@ -24,6 +24,9 @@ dfx_runtime.txt
 # Python virtual environment
 .venv/
 
+# VS Code agent instructions (machine-local paths — not part of the repo)
+/.instructions.md
+
 # Windows
 Thumbs.db
 desktop.ini
